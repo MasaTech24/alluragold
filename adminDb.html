@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> 
+
+  <link rel="stylesheet" href="styles/admin.css">
+
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  
+  <main>
+    <div class="admin-heading-container">
+      <h2>Admin Dashboard</h2>
+      <p class="subheading-p">Manage users and transactions in your application.</p>
+    </div>
+
+    <div class="container">
+      <div class="users-container">
+
+        <div class="users-head">
+          <div class="users-div">
+            <i class="fa-regular fa-user" style="color: rgba(196,138,0,1); cursor: pointer;"></i>
+            <p>Users</p>
+            <span>3</span>
+          </div>
+          <button class="add-btn">  
+            <i class="fa-light fa-plus" style="font-size: 16px;"></i>  
+            <p>Add Users</p>  
+          </button> 
+          
+        </div>
+
+        <div class="search-container">
+          <input type="search" placeholder="Search user by email...">
+          <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px;"></i>
+        </div>
+
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Users</th>
+              <th class="created">Created</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="user-list">
+            <!-- <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>user1@gmail.com</h4>
+                    <p>ID: 1</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Jan 15, 2023</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <div class="active-circle"></div>
+                  <p>Online</p>
+                </div>
+              </td>
+  
+            </tr>
+  
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>user2@gmail.com</h4>
+                    <p>ID: 2</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Dec 25, 2024</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <div class="not-active-circle"></div>
+                  <p>5 days ago</p>
+                </div>
+              </td>
+  
+            </tr>
+  
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>user3@gmail.com</h4>
+                    <p>ID: 3</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Feb 15, 2024</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <div class="offline-circle"></div>
+                  <p>Offline</p>
+                </div>
+              </td>
+  
+            </tr> -->
+          </tbody>
+
+        </table>
+      </div>
+
+
+      <div class="transaction-container">
+
+        <div class="transaction-head">
+          <div class="transaction-div">
+            <i class="fa-regular fa-credit-card" style="color: rgba(196,138,0,1);"></i>
+            <p>Transactions</p>
+            <span>4</span>
+          </div>
+            <button class="transaction-btn">
+              <i class="fa-light fa-plus" style="font-size: 16px;"></i>
+              <p>Add Transactions</p>
+            </button>
+        </div>
+
+        <div class="search-container">
+          <input type="search" placeholder="Search transactions...">
+          <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px;"></i>
+        </div>
+
+        <table class="users-table"  id="transactions-list">
+          <thead>
+            <tr>
+              <th>Transactions</th>
+              <th class="created">Remark</th>
+              <th class="created">Users</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+
+
+          <tbody id="transaction-body">
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-credit-card" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>$250.00</h4>
+                    <p>Transaction #1</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Subscription payment</p>
+              </td>
+  
+              <td class="created">
+                <p>User ID: 1</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <p>May 15, 2023</p>
+                </div>
+              </td>
+  
+            </tr>
+  
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-credit-card" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>$120.50</h4>
+                    <p>Transaction #2</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Product purchase</p>
+              </td>
+  
+              <td class="created">
+                <p>User ID: 2</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <p>Jun 1, 2023</p>
+                </div>
+              </td>
+  
+            </tr>
+  
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-credit-card" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>$75.25</h4>
+                    <p>Transaction #3</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Service fee</p>
+              </td>
+  
+              <td class="created">
+                <p>User ID: 3</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <p>Jun 10, 2023</p>
+                </div>
+              </td>
+  
+            </tr>
+  
+            <tr>
+              <td>
+                <div class="user-id">
+                  <i class="fa-regular fa-credit-card" style="color: rgba(196,138,0,1);"></i>
+                  <div>
+                    <h4>$199.99</h4>
+                    <p>Transaction #4</p>
+                  </div>
+                </div>
+              </td>
+  
+              <td class="created">
+                <p>Premium upgrade</p>
+              </td>
+  
+              <td class="created">
+                <p>User ID: 1</p>
+              </td>
+  
+              <td>
+                <div class="active-div">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <p>Jun 12, 2023</p>
+                </div>
+              </td>
+  
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+    </div>
+
+
+    <!-- hidden overlays  -->
+
+    <div class="overlay" id="add-transaction-overlay" hidden>
+      <div class="add-transaction-container">
+        <div class="add-header">
+          <h3>Add New Transaction</h3>
+          <i class="fa-solid fa-xmark" style="cursor: pointer; pointer-events: all;" id="js-cancle-trans-btn"></i>
+        </div>
+
+        <form id="add-transaction-form">
+          <div class="user-container">
+            <label> User</label>
+            <select id="user-select" required>
+              <option value="">-- Select User --</option>
+            </select>
+          </div>
+
+          <div class="amount-container">
+            <label> Amount ($)</label>
+            <input type="number" placeholder="0.00" id="num-input">
+          </div>
+          <div class="remark-container">
+            <label> Remark</label>
+            <textarea placeholder="Transaction Remark" id="remark-input"></textarea>
+          </div>
+          <div class="date-container">
+            <label> Date</label>
+            <input type="date" id="date-input">
+          </div>
+
+          <div class="btn-contianer">
+            <button type="submit">Add Transaction</button>
+            <button id="trans-cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="overlay ovlay" id="add-user-overlay" hidden>
+      <div class="add-user-container">
+        <div class="add-header">
+          <h3>Add New User</h3>
+          <i class="fa-solid fa-xmark" style="cursor: pointer;  pointer-events: all;" id="js-cancle-btn"></i>
+        </div>
+
+        <form id="add-user-form">
+          <div class="email-container">
+            <label> Email</label>
+            <input type="email" placeholder="user@gmail.com" id="js-email">
+          </div>
+
+          <div class="password-container">
+            <label> Password</label>
+            <input type="password" placeholder="********" id="js-password">
+            <p>Password must be at least 6 characters long.</p>
+          </div>
+
+          <div class="btn-contianer">
+            <button type="submit">Add User</button>
+            <button id="cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div> 
+  </main>
+
+  <script type="module" src="scripts/admin.js"></script>
+  <script type="module" src="scripts/firebase.js"></script>
+</body>
+</html>

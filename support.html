@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/contact.css">
+  <link rel="stylesheet" href="styles/home.css">
+  <link rel="stylesheet" href="styles/loader.css">
+  <link rel="icon" href="images/brand.jpg" type="image/x-icon">
+  <title>Get Support - Masibank Online Banking </title>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+</head>
+
+<body>
+  <div id="loader"> 
+    <div class="lds-ripple">
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  
+  <header>
+    <div class="heading">
+      <!-- <div class="logo">MBF</div> -->
+      <img src="images/brand.jpg" alt="" width="100px">
+      <ul id="navLinks">
+        <li><a href="/#Feature">Feature</a></li>
+        <li><a href="/#About">About</a></li>
+        <li><a href="/#Contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <a href="sign-in.html" class="js-sign-out" id="sign-in">SIGN IN</a>
+
+   <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+      <img src="images/menu.png" width="50px">
+    </a>    
+  </header>
+
+  <main>
+    <div class="contact-container">
+      <div class="brand-div">
+        <img src="images/cnt-logo.svg" alt="" class="logo">
+      </div>
+      <div class="contact-info">
+        <h3>Get Support</h3>
+        <p class="contact-mail">
+          support@masibank.online | contact@masibank.online
+        </p>
+      </div>
+
+      <div class="contact-form" >
+        <form action="#" id="contact-form">
+          
+          <div class="textarea-input-div">
+            <textarea placeholder="Message" id="message" required></textarea>
+            <span id="message-error" class="error-message"></span>
+          </div>
+        </form>
+
+        <button id="js-send-msg">Send Message</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="scripts/contact.js"></script>
+
+
+  <script>
+    const loader = document.getElementById('loader');
+    window.addEventListener('load', ()=> {
+      loader.style.display = "none"
+    })
+  </script>
+</body>
+</html>
