@@ -644,6 +644,7 @@ footer p{
   }
   .support-div, .viist-div {
     /* width: 353px;   */
+    text-algin: center;
     width: 100%;  
   }
   footer p {
