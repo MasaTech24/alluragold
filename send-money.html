@@ -55,18 +55,27 @@
     </div>
   </div>
   
-  <div class="header-one">
-    <div class="logo">Goldmint</div>
-    <!-- <img src="images/bmo-blue.svg" alt="header-logo" width="100px"> -->
-
-    <div style="position: relative;">
-      <i class="fa-solid fa-user" style="font-size: 26px;"></i>
-      <div class="profile-pop-up">
-        <p>usersemail@gmail.com</p>
-        <a href="index.html" class="js-sign-out">SIGN OUT</a>
+  <header>
+    <div class="header-one">
+      <div class="logo">
+        <img src="images/Alluregold logo.svg" alt="" width="160px">
       </div>
-    </div>  
-  </div>
+
+      <!-- <img src="images/bmo-blue.svg" alt="header-logo" width="100px"> -->
+
+      <div style="position: relative;">
+        <i class="fa-solid fa-user" style="font-size: 26px;"  onclick="
+          const profilePopup = document.getElementById('js-pop-up')
+
+          profilePopup.classList.toggle('pop-up')
+          "></i>
+        <div class="profile-pop-up" id="js-pop-up">
+          <p id="js-user-email"></p>
+          <a href="index.html" class="js-sign-out">SIGN OUT</a>
+        </div>
+      </div>
+    </div>
+  </header>
 
   <div class="cancel-img-div js-cancel-btn" id="js-cancel-btn">
     <img src="images/Cancel.png" alt="">
@@ -87,15 +96,6 @@
           <!-- <img src="images/backbtn.png" alt=""  class="left-arrow" style="color: green;"> -->
           <i class="fa-solid fa-arrow-left-long" style="font-size: 28px; color: rgba(196,138,0,1); cursor: pointer;"></i> 
         </button>
-
-        <div class="trans-src-div">
-          <label for="sector" class="trans-src">Transfer source</label>
-          <select name="input" id="js-select">
-            <option value="Choose source" selected> Choose source</option>
-            <option value="Current account" > Current account</option>
-            <option value="Saving account"> Saving account</option>
-          </select>
-        </div>
 
         <div class="acc-name-div">
           <label for="name" class="acc-name">Account name</label>
@@ -221,7 +221,8 @@
           </div>
   
           <div class="successful-div3">
-            <p class="paragraph"><span class="deducted">$2,000.00</span> has been deducted from your account</p>
+            <p class="paragraph">
+              <span class="deducted" id="deducted">$2,000.00</span> has been deducted from your account</p>
             <button class="btn" id="successful-btn" onclick="window.location.replace('my_account.html')">Home</button>
           </div>
         </div>
@@ -238,15 +239,6 @@
         <button class="back-btn " id="international-back-btn">
           <i class="fa-solid fa-arrow-left-long" style="font-size: 28px; color: rgba(196,138,0,1); cursor: pointer;"></i> 
         </button>
-
-        <div class="trans-src-div">
-          <label for="sector" class="trans-src">Transfer source</label>
-          <select name="input" id="inter-select">
-            <option value="Choose Source" selected> Choose Source</option>
-            <option value="Current account"> Current account</option>
-            <option value="Saving account"> Saving account</option>
-          </select>
-        </div>
 
         <div class="acc-name-div">
           <label for="name" class="acc-name">Account name</label>
@@ -376,6 +368,7 @@
   </div>
 
   <script type="module" src="scripts/send-money.js"></script>
+  <!-- <script type="module" src="scripts/bank.js"></script> -->
 
 
   <script>
