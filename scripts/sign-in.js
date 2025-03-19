@@ -1,104 +1,82 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { auth, database } from './firebase.js';
 
-import { getDatabase, ref, push, onValue} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"; 
+import { ref, onValue} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"; 
 
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
+import {  signInWithEmailAndPassword  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
 
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCYKG_aEnj91X31MRdEP12o4vXMmc0Um0g",
-  authDomain: "assetsinvest-bfadb.firebaseapp.com",
-  projectId: "assetsinvest-bfadb",
-  storageBucket: "assetsinvest-bfadb.firebasestorage.app",
-  messagingSenderId: "670510674666",
-  appId: "1:670510674666:web:f84306aa1be3eb538f9d93"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app);
-
-let users = {
-  Ricard_Haernandez: {
-    id: 'Ricard_Harnandez',
-    name: 'Richard Hernandez',
-    email: 'hr7070445@gmail.com',
-    password: 'Ricardhar@5',
-    checking: 760500/100,
-    saving: 300000/100,
-  },
-  Bailey_Kay: {
-    id: 'Bailey_Kay',
-    name: 'Bailey Kay',
-    email: 'baileykayx76@gmail.com',
-    password: 'password456',
-    checking: 50000/100,
-    saving: 10000 / 100,
-  },
-  Karen_Noxy: {
-    id: 'Karen_Noxy',
-    name: 'Leo Grayson',
-    email: 'leograyson1969@gmail.com',
-    password: 'password00',
-    checking: 30000/100,
-    saving: 1000/100,
-  },
-};
-export default users;
 
 document.addEventListener('DOMContentLoaded', () => {
   const signInBtn = document.getElementById('sign-btn');
-  const passwordInp = document.getElementById('password'); 
-  signInBtn.addEventListener('click', () => {
-    const password = passwordInp.value;
-    signIn(password);
-  })
+  signInBtn.addEventListener('click', signIn)
 });
-function signIn(password){
+
+
+function signIn(){
+  let email = document.getElementById('email').value;
+  const password = document.getElementById('password').value; 
   localStorage.setItem("userpassword", password);
-  let emailInput = document.getElementById('email').value;
-  // const password = document.getElementById('password').value; 
 
-  for (let userid in users) {
-    if (users[userid].email === emailInput) {
-      if( users[userid].password === password){
-        // alert('Sign in successful!');
-        signInAnonymously(auth)
-        .then(() => {
-          console.log('Anonymous authentication successful.')
-        })
-        .catch((error) => {
-          console.error('Anonymous authentication failed:', error);
-        });
-        const userRef = ref(database, 'users/' + userid);  
+  signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    const user = userCredential.user;  
+    console.log('User signed in: ', user.uid);
 
-        onValue(userRef, (snapshot) => {
-          snapshot.val();
-          // const data = snapshot.val();
-          // console.log(data);
-        });
-        push(userRef, users[userid])
-        .then(() => {
-          // console.log("User saved successfully!");
-        }).catch((error) => {
-          console.error("Error saving user:", error);
-        });
+    const userRef = ref(database, 'users/' + user.uid);  
+
+    onValue(userRef, (snapshot) => {
+      const data = snapshot.val();
+      if(data){
         document.querySelector('#sign-btn').innerHTML = 'Please wait...';
+        localStorage.setItem("userName", data.name)
         sessionStorage.setItem('isLoggedIn', true);
-        localStorage.setItem("userName", users[userid].name);
-        localStorage.setItem("userId", users[userid].id);
-        localStorage.setItem("userChackings", users[userid].checking);
-        localStorage.setItem("userSavings", users[userid].saving);
         sendOTP();
         return true;
       }else{
         alert('Wrong password')
         return false;
       }
-    }
-  } 
-  alert('Email not found');
+    });
+  })
+
+  // for (let userid in users) {
+  //   if (users[userid].email === emailInput) {
+  //     if( users[userid].password === password){
+  //       // alert('Sign in successful!');
+  //       signInWithEmailAndPassword (auth)
+  //       .then(() => {
+  //         console.log('Anonymous authentication successful.')
+  //       })
+  //       .catch((error) => {
+  //         console.error('Anonymous authentication failed:', error);
+  //       });
+  //       const userRef = ref(database, 'users/' + userid);  
+
+  //       onValue(userRef, (snapshot) => {
+  //         snapshot.val();
+  //         // const data = snapshot.val();
+  //         // console.log(data);
+  //       });
+  //       push(userRef, users[userid])
+  //       .then(() => {
+  //         // console.log("User saved successfully!");
+  //       }).catch((error) => {
+  //         console.error("Error saving user:", error);
+  //       });
+  //       document.querySelector('#sign-btn').innerHTML = 'Please wait...';
+  //       sessionStorage.setItem('isLoggedIn', true);
+  //       localStorage.setItem("userName", users[userid].name);
+  //       localStorage.setItem("userId", users[userid].id);
+  //       localStorage.setItem("userChackings", users[userid].checking);
+  //       localStorage.setItem("userSavings", users[userid].saving);
+  //       sendOTP();
+  //       return true;
+  //     }else{
+  //       alert('Wrong password')
+  //       return false;
+  //     }
+  //   }
+  // } 
+  // alert('Email not found');
 }
 
 function sendOTP() {

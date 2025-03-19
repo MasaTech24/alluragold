@@ -14,12 +14,16 @@ function addUser() {
     const users = snapshot.val();  
     let nextId = 1;  
     
-      if (users) {  
-        // Find the maximum ID currently used  
-        const userIds = Object.keys(users).map(id => parseInt(id));  
-        // Find the next available ID  
-        nextId = Math.max(...userIds) + 1; 
-      }  
+    if (users) {  
+      // Find the maximum ID currently used  
+      const userIds = Object.keys(users).map(id => parseInt(id));  
+      // Find the next available ID  
+      nextId = Math.max(...userIds) + 1; 
+
+      // localStorage.setItem("userName", data.name)
+      // localStorage.setItem("userChackings", users[userid].checking);
+      // sessionStorage.setItem('isLoggedIn', false);
+    }  
         
     createUserWithEmailAndPassword(auth, email, password)    
     .then((userCredential) => {

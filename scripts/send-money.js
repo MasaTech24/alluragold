@@ -1,7 +1,6 @@
-import users from "./sign-in.js";
-import { initializeApp} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+import {database } from './firebase.js'; 
 
-import { getDatabase, ref, get, push, set} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"; 
+import { ref, get, push, set, onValue} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"; 
 
 const signOutBtnn = document.querySelector('.js-sign-out');
 signOutBtnn.addEventListener('click', () => {
@@ -32,19 +31,6 @@ const interAmountBtn = document.querySelector('.inter-amount-btn')
 const interConfirmDiv = document.querySelector('#js-inter-confrim-div');
 // const interConfirmBtn = document.querySelector('.inter-confrim-btn');
 // const interSendOtpDiv = document.querySelector('#inter-send-otp-div');
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDiPQB-_i4b7WlmGzlZTO5RUVNqdK0nbDU",
-  authDomain: "online-bank-97eb2.firebaseapp.com",
-  databaseURL: "https://online-bank-97eb2-default-rtdb.firebaseio.com",
-  projectId: "online-bank-97eb2",
-  storageBucket: "online-bank-97eb2.firebasestorage.app",
-  messagingSenderId: "262153218762",
-  appId: "1:262153218762:web:a405d5ceefa733a5fb2233"
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase();
 
 
 // for local transaction 
@@ -113,21 +99,6 @@ function confrimBackBtn(){
   sendLocal.style.display = "none";
   sendInternation.style.display = "none";
 }
-const selectElement = document.querySelector('#js-select')
-selectElement.addEventListener('change', () => {
-    const selectOption = selectElement.value
-    if (selectOption === 'Current account') {
-      // alert(`withdraw from ${selectOption}`);
-      localStorage.setItem('currentOption', selectOption);
-      localStorage.removeItem('savingOption');
-    } else {
-    if (selectOption === 'Saving account') {
-        // alert(`withdraw from ${selectOption}`);
-        localStorage.setItem('savingOption', selectOption);
-        localStorage.removeItem('currentOption');
-      }
-    }
-})
 
 // showing the amount content 
 proceedBtn.addEventListener('click', (e) => {
@@ -196,59 +167,73 @@ function showComfrimDetails() {
 // showing the withdrawal details and function 
 function sendMoney(userid){
   const amountInp = Number(document.querySelector('.amount-input').value);
-  const currentOption = localStorage.getItem('currentOption');
-  const savingOption = localStorage.getItem('savingOption');
-  if (currentOption) {
-    const checkingRef = ref(database, 'users/' + userid + '/checking')
-    get(checkingRef).then((snapshot) => {
-      let checkingBalance = snapshot.val();
-      if (checkingBalance >= amountInp) {
-        let newTotalBalance = checkingBalance - amountInp;
-        set(checkingRef, newTotalBalance).then(() => {
-          localStorage.removeItem('currentOption');
-          saveTransaction(); 
-          displaySuccessful();
-        })
-      }else{
-        alert('Insufficient balance')
-      }
-    }).catch((error) => {  
-      console.error("Error fetching checking balance:", error);  
-    });
-  }
+
+  // Check if the amount does not exceed the $50 limit  
+  if (amountInp > 50) {  
+    alert('Investment cannot exceed $50000.');  
+    return;  
+  }  
+
+  // Assuming you have a predefined conversion factor from dollars to kg  
+  const conversionRate = 3000;
+  const amountInKg = amountInp / conversionRate; 
+
+  const formattedAmountInKg = amountInKg + " kg";  
 
 
-  if (savingOption) {
-    const savingRef = ref(database, 'users/' + userid + '/saving')
-    get(savingRef).then((snapshot) => {
-      let savingBalance = snapshot.val();
-      if (savingBalance >= amountInp) {
-        let newTotalBalance = savingBalance - amountInp;
-        set(savingRef, newTotalBalance).then(() => {
-          localStorage.removeItem('savingOption');
-          saveTransaction(); 
-          displaySuccessful();
-        })
-      } else {
-        alert('Insufficient balance');
-        // displayNotSuccessful();
-      }
-    }).catch((error) => {  
-      console.error("Error fetching saving balance:", error);  
-    });
-  }
+  const name = sessionStorage.getItem('name');
+  const remark = sessionStorage.getItem('remark')
+
+
+
+  const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
+  get(goldBalanceRef).then((snapshot) => {
+    let goldBalance = snapshot.val();
+    if (goldBalance >= amountInp) {
+      let newGoldBalance = goldBalance - amountInp;
+      set(goldBalanceRef, newGoldBalance).then(() => {
+        updateGoldInvestment(userid, amountInKg);
+        saveTransaction(formattedAmountInKg, remark, name); 
+        displaySuccessful();
+      })
+    }else{
+      alert('Insufficient balance in gold account.'); 
+    }
+  }).catch((error) => {  
+    console.error("Error fetching checking balance:", error);   
+  });
 }
 
-function saveTransaction(){
-  const amount = sessionStorage.getItem('amount');
-  const name = sessionStorage.getItem('name');
-  const remark = sessionStorage.getItem('remark');
-  // Get the current user's ID
+// Function to update the user's gold balance after investing  
+function updateGoldInvestment(userid, amount) {  
+  const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
+  get(goldBalanceRef).then((snapshot) => {  
+    let currentGoldBalance = snapshot.val();  
+     
+    // Deduct the investment amount from gold balance  
+    if (currentGoldBalance >= amount) { 
+      let newGoldBalance = currentGoldBalance; 
+      set(goldBalanceRef, newGoldBalance).then(() => {  
+        console.log('Gold balance updated successfully.');  
+      }).catch((error) => {  
+        console.error("Error updating gold balance:", error);  
+      });
+    }else {  
+      alert('Insufficient gold balance to invest the specified amount.');  
+    } 
+  }).catch((error) => {  
+    console.error("Error fetching gold balance:", error);  
+  }); 
+}
+
+function saveTransaction(amount, remark, name){
+
   const userId = localStorage.getItem("userId");
   const transactionDetails = {
     name: name,
     remark: remark,
-    amount: amount
+    amount: amount,
+    date: new Date().toISOString()
   };
   const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
   push(userTransactionRef, transactionDetails);
@@ -340,9 +325,8 @@ function displaySuccessful(){
   const OTPDiv = document.getElementById('send-otp-div');
   const successfulDiv = document.querySelector('.successful');
   const amountInp = document.querySelector('.amount-input').value;
-  const formattedAmountInp = Number(amountInp).toLocaleString('en-US', {style: 'currency', currency: 'USD'})
-  document.querySelector('.you-sent').textContent = formattedAmountInp ;
-  document.querySelector('.deducted').textContent = formattedAmountInp ;
+  document.querySelector('.you-sent').textContent = amountInp + "kg" ;
+  document.getElementById('deducted').textContent = amountInp + "kg" ;
 
   send.style.display = "none";
   local.style.display = "none";
@@ -414,21 +398,6 @@ function interConfrimBackBtn(){
   sendInternation.style.display = "none";
 }
 
-const interSelectElement = document.querySelector('#inter-select');
-interSelectElement.addEventListener('change', () => {
-  const interSelectOption = interSelectElement.value
-  if (interSelectOption === 'Current account') {
-    // alert(`withdraw from ${interSelectOption}`);
-    localStorage.setItem('interCurrentOption', interSelectOption);
-    localStorage.removeItem('interSavingOption');
-  } else {
-    if (interSelectOption === 'Saving account') {
-      // alert(`withdraw from ${interSelectOption}`);
-      localStorage.setItem('interSavingOption', interSelectOption);
-      localStorage.removeItem('interCurrentOption');
-    }
-  }
-})
 // showing international amount content
 interProceedBtn.addEventListener('click', showInterAmountContent);
 function showInterAmountContent() {
@@ -499,6 +468,84 @@ document.querySelector('#inter-confrim-btn').addEventListener('click', () => {
   interSendOTP()
 });
 
+
+
+
+function interSendMoney(userid){
+  const amountInp = Number(document.querySelector('.js-amount').value);
+
+  // Check if the amount does not exceed the $50 limit  
+  if (amountInp > 100) {  
+    alert('Investment cannot exceed $100.');  
+    return;  
+  }  
+
+  // Assuming you have a predefined conversion factor from dollars to kg  
+  const conversionRate = 3000;
+  const amountInKg = amountInp / conversionRate; 
+
+  const formattedAmountInKg = amountInKg + " kg";  
+
+
+  const interName = localStorage.getItem('internameInp');
+  const interRemark = localStorage.getItem('interRemarkInp');
+
+
+
+  const interGoldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
+  get(interGoldBalanceRef).then((snapshot) => {
+    let InterGoldBalance = snapshot.val();
+    if (InterGoldBalance >= amountInp) {
+      let newGoldBalance = InterGoldBalance - amountInp;
+      set(interGoldBalanceRef, newGoldBalance).then(() => {
+        updateInterGoldInvestment(userid, amountInKg);
+        InterSaveTransaction(formattedAmountInKg, interRemark, interName); 
+        interDisplaySuccessful();
+      })
+    }else{
+      alert('Insufficient balance in gold account.'); 
+    }
+  }).catch((error) => {  
+    console.error("Error fetching checking balance:", error);   
+  });
+}
+
+// Function to update the user's gold balance after investing  
+function updateInterGoldInvestment(userid, amount) {  
+  const IntergoldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
+  get(IntergoldBalanceRef).then((snapshot) => {  
+    let currentInterGoldBalance = snapshot.val();  
+     
+    // Deduct the investment amount from gold balance  
+    if (currentInterGoldBalance >= amount) { 
+      let newGoldBalance = currentInterGoldBalance; 
+      set(IntergoldBalanceRef, newGoldBalance).then(() => {  
+        console.log('Gold balance updated successfully.');  
+      }).catch((error) => {  
+        console.error("Error updating gold balance:", error);  
+      });
+    }else {  
+      alert('Insufficient gold balance to invest the specified amount.');  
+    } 
+  }).catch((error) => {  
+    console.error("Error fetching gold balance:", error);  
+  }); 
+}
+
+function InterSaveTransaction( interAmount, interRemark, interName) {
+  // Get the current user's ID
+  const userId = localStorage.getItem("userId");
+  const transactionDetails = {
+    name: interName,
+    remark: interRemark,
+    amount: interAmount,
+    date: new Date().toISOString()
+  };
+  const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
+  push(userTransactionRef, transactionDetails);
+
+}
+
 function interSendOTP() {
   let emailInput = sessionStorage.getItem("userEmail");
   const OTPDiv = document.getElementById('send-otp-div');
@@ -549,58 +596,6 @@ function interSendOTP() {
     console.log(error)
   })
 }
-function interSendMoney(userid){
-  const amountInp = Number(document.querySelector('.js-amount').value);
-  const interCurrent = localStorage.getItem('interCurrentOption');
-  const interSaving = localStorage.getItem('interSavingOption');
-
-  if (interCurrent) {
-    console.log('click')
-    const interCurrentRef = ref(database, 'users/' + userid + '/checking')
-    get(interCurrentRef).then((snapshot) => {
-      let interCheckingBalance = snapshot.val();
-      if (interCheckingBalance >= amountInp) {
-        let interNewTotalBalance = interCheckingBalance - amountInp;
-        set(interCurrentRef, interNewTotalBalance);
-        interDisplaySuccessful();
-        InterSaveTransaction();
-      }else{
-        alert('Insufficient balance')
-      }
-    })
-  }
-
-  if (interSaving) {
-    const interSavingRef = ref(database, 'users/' + userid + '/saving')
-    get(interSavingRef).then((snapshot) => {
-      let interSavingBalance = snapshot.val();
-      if (interSavingBalance >= amountInp) {
-        let interNewTotalBalance = interSavingBalance - amountInp;
-        set(interSavingRef, interNewTotalBalance);
-        interDisplaySuccessful();
-        InterSaveTransaction();
-      }else{
-        alert('Insufficient balance');
-        displayNotSuccessful()
-      }
-    })
-  }
-}
-function InterSaveTransaction() {
-  const interAmount = localStorage.getItem('interAmount');
-  const interName = localStorage.getItem('internameInp');
-  const interRemark = localStorage.getItem('interRemarkInp');
-  // Get the current user's ID
-  const userId = localStorage.getItem("userId");
-  const transactionDetails = {
-    name: interName,
-    remark: interRemark,
-    amount: interAmount
-  };
-  const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
-  push(userTransactionRef, transactionDetails);
-
-}
 function interDisplaySuccessful(){
   const OTPDiv = document.getElementById('send-otp-div');
   const successfulDiv = document.querySelector('.successful');
@@ -623,3 +618,29 @@ function interDisplaySuccessful(){
   sendLocal.style.display = "none";
   sendInternation.style.display = "none";
 }
+
+document.addEventListener('DOMContentLoaded', () => { 
+  const userId = localStorage.getItem("userId");
+  const user = userId;  
+
+  console.log('User signed in: ', user);
+
+  if(user){
+    const userRef = ref(database, 'users/' + user);
+
+    onValue(userRef, (snapshot) => {
+      const data = snapshot.val();  
+      if (data) {
+        // console.log(data.email)
+        document.getElementById('js-user-email').textContent = data.email;   
+      }else {  
+        console.log('No user data found.');   
+        window.location.href = "sign-in.html";  
+      } 
+    })
+  } else {  
+    console.log('No user is signed in.');   
+    window.location.href = "sign-in.html";   
+  } ;
+});
+

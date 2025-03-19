@@ -1,92 +1,49 @@
-// class login {
-//   constructor(form, inputFields){
-//     this.form = form;
-//     this.inputFields = inputFields;
-//     this.validateOnSubmit();
-//   }
+import { auth, database } from './firebase.js';
 
-//   validateOnSubmit(){
-//     let self = this;
+import { ref, set} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"; 
 
-//     this.form.addEventListener('submit', (e) => {
-//       e.preventDefault();
-//       let error = 0;
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js"; 
 
-//       self.inputFields.forEach((inputFields) => {
-//         const input = document.querySelector(`#${inputFields}`);
-
-//         if(self.validateFields(input) === false){
-//           error++;
-//         }
-
-//       })
-//       if(error === 0){
-//         // console.log('successful');
-
-//         // do loin api here 
-//         localStorage.setItem('auth', 1);
-//         window.location.replace('/')
-//         this.form.submit();
-//       }
-//     })
-//   }
-
-//   validateFields(inputFields){
-//     if(inputFields.value.trim() == ''){
-//       this.setStatus(
-//         inputFields,
-//         `${inputFields.previousElementSibling.innerText} cannot be blank`,
-//         'error'
-//       )
-//       return false;
-//     }else {
-//       if(inputFields.type === 'password'){
-//         if(inputFields.value.length < 8){
-//           this.setStatus(
-//             inputFields,
-//             `${inputFields.previousElementSibling.innerText} must be at least 8 characters`,
-//             'error'
-//           );
-//           return false;
-//         }else{
-//           this.setStatus(inputFields, null, 'success');
-//           return true;
-//         }
-//       }else{
-//         this.setStatus(inputFields, null, 'success');
-//         return true;
-//       }
-//     }
-//   }
-
-//   setStatus(inputFields, message, status){
-//     const errorMessage = inputFields.parentElement.querySelector('.error-message');
-//     if(status === 'success'){
-//       if(errorMessage){
-//         errorMessage.innerText = '';
-//       }
-//       errorMessage.classList.remove('error-message');
-//     }
-
-//     if(status === 'error'){
-//       errorMessage.innerText = message;
-//       inputFields.classList.add('error-message');
-//     }
-//   }
-// }
-
-// const form = document.querySelector('.js-login-form');
-// if(form){
-//   const inputFields = ['email', 'password'];
-//   const validator = new login(form, inputFields);
-// }
-const signUpBtn = document.querySelector('.js-sign-in-button');
 const fgtPwdLink =  document.querySelector('.fgt-pwd');
 
-signUpBtn.addEventListener('click', ()=> {
+document.addEventListener('DOMContentLoaded', () => {
+  const signUpBtn = document.querySelector('.js-sign-in-button');
+  signUpBtn.addEventListener('click', signUp)
   // sendOTP();
-  alert('Service Unavailable, try again later....');
 });
+
+function signUp() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  createUserWithEmailAndPassword(auth, email, password) 
+  .then((userCredential) => {
+    const user = userCredential.user;  
+    localStorage.setItem("userId", user.uid);
+    localStorage.setItem("userEmail", user.email);
+    console.log('User signed up: ', user.uid); 
+
+    // Prepare user data  
+    const userDetails = {  
+      email: email,  
+      uid: user.uid,  
+      createdAt: new Date().toISOString(),  
+      status: 'Active',
+      goldBalance: 0
+    };
+
+    // Save user details to Realtime Database  
+    return set(ref(database, 'users/' + user.uid), userDetails); 
+  })
+  .then(() => {
+    console.log('User added to database successfully');  
+    window.location.href="sign-in.html";
+  })
+  .catch((error) => {  
+    console.error('Error signing up: ', error.message);  
+    alert('Sign up failed: ' + error.message); 
+  });
+}
 
 fgtPwdLink.addEventListener('click', ()=> {
   alert('Service Unavailable, try again later....');
