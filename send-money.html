@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles/send-money.css">
   <link rel="stylesheet" href="styles/loader.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="icon" href="images/icon Alluregold.svg" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -98,23 +99,24 @@
         </button>
 
         <div class="acc-name-div">
-          <label for="name" class="acc-name">Account name</label>
-          <input type="text" placeholder="Account name" class="name-input">
+          <label for="name" class="acc-name">Enter Name</label>
+          <input type="text" placeholder="Type here..." class="name-input">
+
         </div>
 
         <div class="acc-number-div">
-          <label for="number" class="acc-number">Account number</label>
-          <input type="tel" placeholder="Account number" class="number-input" maxlength="10">
+          <label for="number" class="acc-number">Account Number</label>
+          <input type="tel" placeholder="Type here..." class="number-input" maxlength="10">
         </div>
 
         <div class="bank-name-div">
-          <label for="name" class="bank-name">Bank name</label>
-          <input type="text" placeholder="Bank name" id="bank-name-div">
+          <label for="name" class="bank-name">Bank Name</label>
+          <input type="text" placeholder="Type here..." id="bank-name-div">
         </div>
 
         <div class="remark-div">
           <label for="remark" class="remark">Remark</label>
-          <input type="text" placeholder="Remark" class="remark-input">
+          <input type="text" placeholder="Type here..." class="remark-input">
         </div>
 
         <button class="btn js-local-btn">Proceed</button>
@@ -128,8 +130,8 @@
         </button>
 
         <div class="acc-name-div">
-          <label for="name" class="acc-name">Amount</label>
-          <input type="text" placeholder="$0.00" required class="amount-input">
+          <label for="name" class="acc-name">Quanlity (Kg)</label>
+          <input type="text" placeholder="Type here..." required class="amount-input">
         </div>
 
         <button class="btn amount-btn">Continue</button>
@@ -144,8 +146,8 @@
 
         <div class="confrim-details-div">
           <div class="name-div">
-            <p>Account number</p>
-            <strong class="name"></strong>
+            <p>Transaction Type</p>
+            <strong class="transaction-type"></strong>
           </div>
 
           <div class="number-div">
@@ -159,7 +161,7 @@
           </div>
 
           <div class=" Amount-div">
-            <p>Amount</p>
+            <p>Quanlity</p>
             <strong class="amount"></strong>
           </div>
 

@@ -8,15 +8,16 @@
   --text-color: #5C4C4C;
   --input-bg: #FFFFFF;
 }
+body{
+  background-color: #FFFAFA;
+}
 main{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: #FFFAFA;
   padding: 3rem 1rem;
-  /* max-width: 100%;
-  overflow: hidden; */
   position: relative;
 }
 .contact-container{
@@ -84,7 +85,7 @@ form{
   height: 2.875rem;
   padding-left: 5px;
   line-height: 2.875rem;
-  background-color: var(--input-bg);
+  background-color: #FFFAFA;
   color: var(--text-color);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
   /* box-shadow: 0rem 0rem 10rem 9.75rem rgba(0,0,0,0.012); */
@@ -112,7 +113,7 @@ form{
   line-height: 1.75;
   padding-top: 0.7rem;
   color: var(--text-color);
-  background-color: var(--input-bg);
+  background-color: #FFFAFA;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
   /* box-shadow: 0rem 0rem 10rem 9.75rem rgba(0,0,0,0.012); */
   font-size: 0.875em;
@@ -140,7 +141,7 @@ form{
   border-radius: 2.5rem;
   direction: var(--site-language-direction);
   text-overflow: ellipsis;
-  background-color: rgba(0, 117, 190, 1);
+  background-color: rgba(196,138,0,1);
   cursor: pointer;
   color: var(--input-bg);
   border: none;

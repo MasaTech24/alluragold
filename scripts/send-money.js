@@ -107,15 +107,15 @@ proceedBtn.addEventListener('click', (e) => {
 });
   
 function showAmountContent() {
-  const nameInp = document.querySelector('.name-input').value;
-  sessionStorage.setItem('name', nameInp)
+  // const nameInp = document.querySelector('.name-input').value;
+  // sessionStorage.setItem('name', nameInp)
   const numberInp = document.querySelector('.number-input').value;
 
   const bankNameInp = document.querySelector('#bank-name-div').value;
   const remarkInp = document.querySelector('.remark-input').value;
   sessionStorage.setItem('remark', remarkInp)
 
-  if(nameInp === '' || numberInp === '' || bankNameInp === '' || remarkInp === '') {
+  if(numberInp === '' || bankNameInp === '' || remarkInp === '') {
     alert("Please fill in all input fields.");
     return; 
   }
@@ -143,7 +143,7 @@ function showComfrimDetails() {
   const numberInp = document.querySelector('.number-input').value;
   const bankNameInp = document.querySelector('#bank-name-div').value;
 
-  document.querySelector('.name').textContent = nameInp;
+  document.querySelector('.transaction-type').textContent = nameInp;
   document.querySelector('.number').textContent = numberInp;
   document.querySelector('.bank').textContent = bankNameInp;
   document.querySelector('.amount').textContent = formattedAmountInp;
@@ -168,51 +168,50 @@ function showComfrimDetails() {
 function sendMoney(userid){
   const amountInp = Number(document.querySelector('.amount-input').value);
 
-  // Check if the amount does not exceed the $50 limit  
-  if (amountInp > 50) {  
-    alert('Investment cannot exceed $50000.');  
+
+  // Check if the amount does not exceed the limit for the transaction (here, for example, $50)  
+  if (amountInp <= 0 || amountInp > 50000) {  
+    alert('Investment must be greater than $0 and cannot exceed $50,000.');  
     return;  
-  }  
+  } 
 
   // Assuming you have a predefined conversion factor from dollars to kg  
   const conversionRate = 3000;
   const amountInKg = amountInp / conversionRate; 
-
   const formattedAmountInKg = amountInKg + " kg";  
 
-
-  const name = sessionStorage.getItem('name');
-  const remark = sessionStorage.getItem('remark')
-
+  const remark = sessionStorage.getItem('remark') || 'Transaction';
+  const name = localStorage.getItem('nameInp');
 
 
-  const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
-  get(goldBalanceRef).then((snapshot) => {
-    let goldBalance = snapshot.val();
-    if (goldBalance >= amountInp) {
-      let newGoldBalance = goldBalance - amountInp;
-      set(goldBalanceRef, newGoldBalance).then(() => {
-        updateGoldInvestment(userid, amountInKg);
-        saveTransaction(formattedAmountInKg, remark, name); 
-        displaySuccessful();
-      })
-    }else{
-      alert('Insufficient balance in gold account.'); 
-    }
-  }).catch((error) => {  
-    console.error("Error fetching checking balance:", error);   
-  });
+  // const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
+  // get(goldBalanceRef).then((snapshot) => {
+  //   let goldBalance = snapshot.val();
+  //   if (goldBalance >= amountInp) {
+  //     let newGoldBalance = goldBalance - amountInp;
+  //     set(goldBalanceRef, newGoldBalance).then(() => {
+  //       updateGoldInvestment(userid, amountInKg);
+  //       saveTransaction(formattedAmountInKg, remark, name); 
+  //       displaySuccessful();
+  //     })
+  //   }else{
+  //     alert('Insufficient balance in gold account.'); 
+  //   }
+  // }).catch((error) => {  
+  //   console.error("Error fetching checking balance:", error);   
+  // });
 }
+ 
 
 // Function to update the user's gold balance after investing  
 function updateGoldInvestment(userid, amount) {  
   const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
   get(goldBalanceRef).then((snapshot) => {  
-    let currentGoldBalance = snapshot.val();  
+    let currentInterGoldBalance = snapshot.val();  
      
     // Deduct the investment amount from gold balance  
-    if (currentGoldBalance >= amount) { 
-      let newGoldBalance = currentGoldBalance; 
+    if (currentInterGoldBalance >= amount) { 
+      let newGoldBalance = currentInterGoldBalance; 
       set(goldBalanceRef, newGoldBalance).then(() => {  
         console.log('Gold balance updated successfully.');  
       }).catch((error) => {  
@@ -223,7 +222,7 @@ function updateGoldInvestment(userid, amount) {
     } 
   }).catch((error) => {  
     console.error("Error fetching gold balance:", error);  
-  }); 
+  });
 }
 
 function saveTransaction(amount, remark, name){
@@ -237,7 +236,6 @@ function saveTransaction(amount, remark, name){
   };
   const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
   push(userTransactionRef, transactionDetails);
-
 }
 
 document.querySelector('#confirm-details-btn').addEventListener('click', () => {
@@ -492,22 +490,22 @@ function interSendMoney(userid){
 
 
 
-  const interGoldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
-  get(interGoldBalanceRef).then((snapshot) => {
-    let InterGoldBalance = snapshot.val();
-    if (InterGoldBalance >= amountInp) {
-      let newGoldBalance = InterGoldBalance - amountInp;
-      set(interGoldBalanceRef, newGoldBalance).then(() => {
-        updateInterGoldInvestment(userid, amountInKg);
-        InterSaveTransaction(formattedAmountInKg, interRemark, interName); 
-        interDisplaySuccessful();
-      })
-    }else{
-      alert('Insufficient balance in gold account.'); 
-    }
-  }).catch((error) => {  
-    console.error("Error fetching checking balance:", error);   
-  });
+  // const interGoldBalanceRef = ref(database, `users/${userid}/goldBalance`)
+  // get(interGoldBalanceRef).then((snapshot) => {
+  //   let InterGoldBalance = snapshot.val();
+  //   if (InterGoldBalance >= amountInp) {
+  //     let newGoldBalance = InterGoldBalance - amountInp;
+  //     set(interGoldBalanceRef, newGoldBalance).then(() => {
+  //       updateInterGoldInvestment(userid, amountInKg);
+  //       InterSaveTransaction(formattedAmountInKg, interRemark, interName); 
+  //       interDisplaySuccessful();
+  //     })
+  //   }else{
+  //     alert('Insufficient balance in gold account.'); 
+  //   }
+  // }).catch((error) => {  
+  //   console.error("Error fetching checking balance:", error);   
+  // });
 }
 
 // Function to update the user's gold balance after investing  
@@ -643,4 +641,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = "sign-in.html";   
   } ;
 });
-
+ 

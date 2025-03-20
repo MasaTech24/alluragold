@@ -86,26 +86,44 @@ function RenderTranasationList(userId) {
     const transactionList = document.getElementById('js-transaction');
     transactionList.innerHTML = '';
     if(transactions){
-      for (const key in transactions) {
-        const transaction = transactions[key];
+      const transactionArray = Object.entries(transactions).map(([key, value]) => ({
+        key,
+        ...value
+      }));
+      transactionArray.sort((a, b) => new Date(a.date) - new Date(b.date));
+      transactionArray.forEach((transaction) => {
         transactionList.innerHTML += `
           <div class="transactions-lists ">
             <div class="product-item">
-              <div>${transaction.name}</div>
+              <div>${transaction.type}</div>
               <p>${transaction.date}</p>
             </div>
-            <div class="amount-div">
-              <div>-${transaction.amount}</div>
+            <div class="${transaction.type === 'withdraw' ? 'amount-div' : 'incoming-amount-div'}">
+              <div>${transaction.type === 'withdraw' ? '-' : '+'} ${transaction.amount + 'kg'}</div>
             </div> 
           </div>
         `
-      }
+      })
+      // for (const key in transactions) {
+      //   const transaction = transactions[key];
+      //   transactionList.innerHTML += `
+      //     <div class="transactions-lists ">
+      //       <div class="product-item">
+      //         <div>${transaction.type}</div>
+      //         <p>${transaction.date}</p>
+      //       </div>
+      //       <div class="${transaction.type === 'withdraw' ? 'amount-div' : 'incoming-amount-div'}">
+      //         <div>${transaction.type === 'withdraw' ? '-' : '+'} ${transaction.amount + 'kg'}</div>
+      //       </div> 
+      //     </div>
+      //   `
+      // }
     } else {  
       transactionList.innerHTML = `
         <div class="transactions-lists ">
           <p>No transactions found.</p>
         </div>
-      `;  
+      ` 
     }  
   })
 }

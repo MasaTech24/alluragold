@@ -132,6 +132,9 @@ td {
   padding: 8px;  
   text-align: left;  
 }
+tr{
+  cursor: pointer;
+}
 th{
   color: gray;
   font-family: var(--font-family);
@@ -331,5 +334,9 @@ textarea{
   }
   .created{
     display: none;
+  }
+  td {
+    font-size: 13px;
+    width: 100%;
   }
 }

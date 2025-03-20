@@ -23,16 +23,19 @@ function signIn(){
 
     const userRef = ref(database, 'users/' + user.uid);  
 
+    const signInBtn = document.querySelector('#sign-btn');
+  
+    this.disabled = true;
+    signInBtn.innerHTML= "Please wait..."
     onValue(userRef, (snapshot) => {
       const data = snapshot.val();
       if(data){
-        document.querySelector('#sign-btn').innerHTML = 'Please wait...';
         localStorage.setItem("userName", data.name)
         sessionStorage.setItem('isLoggedIn', true);
         sendOTP();
         return true;
       }else{
-        alert('Wrong password')
+        alert('Wrong password');
         return false;
       }
     });
@@ -95,7 +98,7 @@ function sendOTP() {
   // console.log(otp)
 
   let templateParam = {
-    from_name: 'MB Finance Online Banking',
+    from_name: 'Alluregold Gold Investment',
     otp: otp,
     nessage: 'Please Confirm your OTP',
     reply_to: emailInput
@@ -110,7 +113,6 @@ function sendOTP() {
       e.preventDefault()
       console.log('clicked');
       if(otpInp.value == otp){
-        // alert('Email address verified...');
         window.location.replace("/my_account.html");
       }else(
         alert('Incorrect Otp')
