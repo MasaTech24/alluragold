@@ -31,12 +31,12 @@ function signIn(){
       const data = snapshot.val();
       if(data){
         localStorage.setItem("userName", data.name)
-        sessionStorage.setItem('isLoggedIn', true);
+        localStorage.setItem("userId", data.uid);
         sendOTP();
-        return true;
+        // return true;
       }else{
         alert('Wrong password');
-        return false;
+        // return false;
       }
     });
   })

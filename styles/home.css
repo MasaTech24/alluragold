@@ -491,7 +491,7 @@ footer p{
     width:100%;
   } */
   .card-body p {
-    width: 400px;
+    width: 360px;
   }
   .img-div img {
     width: 100%;
@@ -542,17 +542,17 @@ footer p{
   }
   .section1,
   .section4{
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    padding: 80px 0;
+    padding: 0;
   }
   .section2{
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
-    padding: 80px 25px;
+    padding:80px 0 0 0;
   }
   .content-div{
     padding-top: 0;
@@ -599,7 +599,7 @@ footer p{
   .card1,
   .card2,
   .card3 {
-    margin-right: 50px;
+    margin-right: 0;
     width: 100%;
 
   }
@@ -608,6 +608,13 @@ footer p{
   .card2 .card2-img-div,
   .card3 .card3-img-div{
     width: 100%;
+  }
+  .card2 .card2-img-div, 
+  .card3-img-div {
+    height: 150px;
+  }
+  .card-body {
+    height: 250px;
   }
   .section4{
     flex-direction: column;
