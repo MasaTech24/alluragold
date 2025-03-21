@@ -616,6 +616,9 @@ footer p{
   .card-body {
     height: 250px;
   }
+  .card-body p {
+    width: 100%;
+  }
   .section4{
     flex-direction: column;
   }
