@@ -158,6 +158,14 @@ a{
   flex-direction: column;
   row-gap: 10px;
 }
+.account-balance .username{
+  font-family: var(--font);
+  font-style: normal;
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(250, 181, 21, 1);
+  margin-bottom: 10px;
+}
 .checking-div,
 .saving-div{
   display: flex;
