@@ -18,7 +18,7 @@
 
   <link rel="stylesheet" href="styles/bank.css">
   <!-- <link rel="stylesheet" href="styles/send-money.css"> -->
-  <title>My Account - Asset Hold</title>
+  <title>My Account - Alluregold</title>
 </head>
 <body>
   <div class="market-header">
@@ -53,6 +53,7 @@
           profilePopup.classList.toggle('pop-up')
           "></i>
         <div class="profile-pop-up" id="js-pop-up">
+          <p id="js-user-username"></p>
           <p id="js-user-email"></p>
           <a href="index.html" class="js-sign-out">SIGN OUT</a>
         </div>
@@ -61,20 +62,17 @@
 
     <div class="header-two js-header-two">
       <div class="account-balance">
+        <h2 class="username" id="js-user-fullname"></h2>
         <span>Gold Balance</span>
         <div class="checking-div">
-          <p class="total-balance" id="js-checking">18 oz<p>
+          <p class="total-balance" id="js-checking"><p>
           <!-- <span id="checking"></span> -->
         </div>
-        <!-- <div class="saving-div">
-          <p id="saving"></p>
-          <span>Saving</span>
-        </div> -->
         </p>
       </div>
 
       <div style="display: flex; flex-direction: column; row-gap: 10px;">
-        <a href="contact.html" class="invest-btn"> 
+        <a href="invest.html" class="invest-btn"> 
           <!-- id="sendmoneybtn" -->
           <div class="add-card">
             <p>Invest Now</p>
