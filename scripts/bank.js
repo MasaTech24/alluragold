@@ -2,33 +2,7 @@ import { database } from './firebase.js';
 
 import { ref, onValue} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";  ;
 
-// const userName = localStorage.getItem("userName");
-// const Name = document.getElementById("name");
-// Name.textContent = userName;
 const userId = localStorage.getItem("userId");
-
-// console.log(userId)
-
-
-// function SavingsBalanceChanges(userId) {
-//   console.log(`Savings balance for User ID: ${userId}`);  
-//   const userRef = ref(database, 'users/' + userId + '/saving');
-//   onValue(userRef, (snapshot) => {
-//     const savingBalance = snapshot.val();
-//     if(savingBalance !== null){
-//       const formattedBalance = '$ ' + savingBalance.toFixed(2);
-//       console.log(formattedBalance)
-//       document.getElementById('saving').textContent
-//       = formattedBalance
-//     } else {
-//       document.getElementById('saving').textContent = 'Unavaible';
-//     }
-//   });
-// }
-// SavingsBalanceChanges(userId);
-
-
-
 
 const signOutBtnn = document.querySelector('.js-sign-out');
 signOutBtnn.addEventListener('click', () => {
@@ -51,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = snapshot.val();  
       if (data) {
         // console.log(data.email)
+        document.getElementById('js-user-fullname').textContent = data.fullname; 
+        document.getElementById('js-user-username').textContent = data.username; 
         document.getElementById('js-user-email').textContent = data.email; 
         document.getElementById('js-checking').textContent = data.goldBalance + " kg";
         RenderTranasationList(data.uid);  

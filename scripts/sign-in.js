@@ -1,6 +1,6 @@
 import { auth, database } from './firebase.js';
 
-import { ref, onValue} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"; 
+import { ref, onValue, query, orderByChild, equalTo, get} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"; 
 
 import {  signInWithEmailAndPassword  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
 
@@ -11,81 +11,143 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-function signIn(){
-  let email = document.getElementById('email').value;
+async function signIn(event){
+  event.preventDefault();
+  let identifier  = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value; 
   localStorage.setItem("userpassword", password);
 
-  signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
-    const user = userCredential.user;  
-    console.log('User signed in: ', user.uid);
+  const signInBtn = document.getElementById('sign-btn');
 
-    const userRef = ref(database, 'users/' + user.uid);  
+  if (!identifier) {  
+    alert('Please enter a valid email or username.');  
+    return; // Exit if the email is not valid  
+  } 
 
-    const signInBtn = document.querySelector('#sign-btn');
+    // Handle email validation only if it looks like an email  
+    if (validEmail(identifier)) {  
+      alert('Email format is valid');  
+    } else if (identifier.length < 5) {   
+      alert('Username should be at least 5 characters long.');  
+      return; // Exit if username is too short  
+    }  
   
-    this.disabled = true;
-    signInBtn.innerHTML= "Please wait..."
-    onValue(userRef, (snapshot) => {
-      const data = snapshot.val();
-      if(data){
-        localStorage.setItem("userName", data.name)
-        localStorage.setItem("userId", data.uid);
-        sendOTP();
-        // return true;
-      }else{
-        alert('Wrong password');
-        // return false;
-      }
-    });
-  })
+  signInBtn.disabled = true;  
+  signInBtn.innerHTML = "Please wait...";  
+   
+  try{
+    await signInWithEmailAndPassword(auth, identifier, password);
+    const user = auth.currentUser;
+    console.log('User signed in: ', user.uid); 
+    handleUserData(user);
+    
+  } catch (emailError) {   
+    // handle specific error messages  
+    if(emailError.code === "auth/user-not-found"){
+      alert('No user found with this email. Please register.');    
+    }else if(emailError.code === "auth/wrong-password"){
+      alert('Incorrect password. Please try again.');  
+    }else if(emailError.code === "auth/too-many-requests") {
+      alert('Too many failed login attempts. Please try again later.');  
+    } else if (emailError.code === 'auth/invalid-credential') {  
+      alert('Invalid credentials. Please ensure your email and password are correct.');  
+    } else{
+      console.error('Error signing in with email:', emailError.message);
+    }
 
-  // for (let userid in users) {
-  //   if (users[userid].email === emailInput) {
-  //     if( users[userid].password === password){
-  //       // alert('Sign in successful!');
-  //       signInWithEmailAndPassword (auth)
-  //       .then(() => {
-  //         console.log('Anonymous authentication successful.')
-  //       })
-  //       .catch((error) => {
-  //         console.error('Anonymous authentication failed:', error);
-  //       });
-  //       const userRef = ref(database, 'users/' + userid);  
+    const userQuery = query(ref(database, 'users'), orderByChild('username'), equalTo(identifier));  
+    const snapshot = await get(userQuery);  
 
-  //       onValue(userRef, (snapshot) => {
-  //         snapshot.val();
-  //         // const data = snapshot.val();
-  //         // console.log(data);
-  //       });
-  //       push(userRef, users[userid])
-  //       .then(() => {
-  //         // console.log("User saved successfully!");
-  //       }).catch((error) => {
-  //         console.error("Error saving user:", error);
-  //       });
-  //       document.querySelector('#sign-btn').innerHTML = 'Please wait...';
-  //       sessionStorage.setItem('isLoggedIn', true);
-  //       localStorage.setItem("userName", users[userid].name);
-  //       localStorage.setItem("userId", users[userid].id);
-  //       localStorage.setItem("userChackings", users[userid].checking);
-  //       localStorage.setItem("userSavings", users[userid].saving);
+    if (snapshot.exists()) {
+      const userData = snapshot.val()[Object.keys(snapshot.val())[0]];  
+      const userEmail = userData.email; 
+
+      try {
+        await signInWithEmailAndPassword(auth, userEmail, password); 
+        console.log('User signed in successfully with username.');
+        handleUserData(userData);     
+
+      } catch (signinError) {  
+        console.error('Error signing in with username:', signinError.message);  
+        if(signinError.code === "auth/wrong-password"){
+          alert('Incorrect password for the username. Please try again.');  
+        }else if (signinError.code === "auth/user-not-found"){
+          alert('No user found with this username. Please check.');  
+        }else if (signinError.code === "auth/too-many-requests"){
+          alert('Too many failed login attempts with username. Please try again later.');  
+        } else if (signinError.code === 'auth/invalid-credential') {  
+          alert('Invalid Password for this user. Please check and try again.');  
+        }else {
+          console.error('Sign in failed: ' + signinError.message);  
+        }
+      }  
+    }else{
+      alert('No user found with that username or email.');  
+    }
+  }finally {  
+    // Always re-enable the sign-in button and reset text  
+    signInBtn.disabled = false;  
+    signInBtn.innerHTML = "SIGN IN";  
+  }
+  // signInWithEmailAndPassword(auth, email, password)
+  // .then((userCredential) => {
+  //   const user = userCredential.user;  
+  //   console.log('User signed in: ', user.uid);
+
+  //   const userRef = ref(database, 'users/' + user.uid);  
+
+  //   const signInBtn = document.querySelector('#sign-btn');
+  
+  //   this.disabled = true;
+  //   signInBtn.innerHTML= "Please wait..."
+  //   onValue(userRef, (snapshot) => {
+  //     const data = snapshot.val();
+  //     if(data){
+  //       localStorage.setItem("userName", data.name)
+  //       localStorage.setItem("userId", data.uid);
   //       sendOTP();
-  //       return true;
+  //       // return true;
   //     }else{
-  //       alert('Wrong password')
+  //       alert('Account Not found');
   //       return false;
   //     }
-  //   }
-  // } 
-  // alert('Email not found');
+  //   })
+  // })
+
 }
+
+function handleUserData(user) {  
+  const userRef = ref(database, 'users/' + user.uid);  
+ 
+  onValue(userRef, (snapshot) => {  
+    const data = snapshot.val();  
+    if (data) {  
+      localStorage.setItem("userName", data.username); 
+      localStorage.setItem("userId", data.uid); 
+      // sendOTP();  
+      window.location.replace("/my_account.html");
+    }else{
+      alert('Account Not found');  
+    }
+  })
+
+}
+
+function validEmail(email) {   
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
+  return emailPattern.test(email);  
+} 
 
 function sendOTP() {
   // Reference  
-  let emailInput = document.getElementById('email').value;
+  let emailInput = document.getElementById('email').value.trim();
   sessionStorage.setItem("userEmail", emailInput);
+
+  if (!isValidEmail(emailInput)) {  
+    alert('Invalid email address. Please check and try again.');  
+    return; // Exit if the email is invalid  
+  }  
+
   const otpverify = document.getElementsByClassName('otpverify')[0];
   const otpBtn = document.querySelector('.opt-btn');
   let otpInp = document.getElementById('opt-input');
