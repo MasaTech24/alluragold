@@ -21,6 +21,12 @@ async function signUp() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  const signUpBtn = document.querySelector('.js-sign-in-button');
+
+  signUpBtn.disabled = true;  
+  signUpBtn.innerHTML = "Creating Account...";  
+
+
   try{
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);  
     const user = userCredential.user;  
@@ -57,6 +63,10 @@ async function signUp() {
   } catch (error) {
     console.error('Error during sign-up:', error);
     alert('Sign up failed: ' + error.message);
+  }finally {  
+    // Always re-enable the sign-in button and reset text  
+    signUpBtn.disabled = false;  
+    signUpBtn.innerHTML = "Create Account";  
   }
   // get(queryRef).then((snapshot) => {
   //   if(snapshot.exists()){

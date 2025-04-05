@@ -24,6 +24,9 @@
       <p class="subheading-p">Manage users and transactions in your application.</p>
     </div>
 
+    <!-- <div id="chart-container">
+      <canvas id="userChart"></canvas>
+    </div> -->
     <div class="container">
       <div class="users-container">
 
@@ -181,6 +184,16 @@
 
         <form id="add-user-form">
           <div class="email-container">
+            <label> Full Name</label>
+            <input type="text" placeholder="John Deo" id="js-fullname">
+          </div>
+
+          <div class="email-container">
+            <label> Username</label>
+            <input type="text" placeholder="johndeo12" id="js-username">
+          </div>
+
+          <div class="email-container">
             <label> Email</label>
             <input type="email" placeholder="user@gmail.com" id="js-email">
           </div>
@@ -191,7 +204,7 @@
             <p>Password must be at least 6 characters long.</p>
           </div>
 
-          <div class="btn-contianer">
+          <div class="btn-contianer">            
             <button type="submit">Add User</button>
             <button id="cancel-btn">Cancel</button>
           </div>
@@ -251,17 +264,63 @@
             <input type="email" placeholder="user@gmail.com" id="js-user-email">
           </div>
 
+          <div class="email-container">
+            <label>Full Name</label>
+            <input type="text" placeholder="John Deo" id="js-user-fullname">
+          </div>
+
+          <div class="email-container">
+            <label>Address</label>
+            <input type="text" placeholder="John Deo" id="js-user-address">
+          </div>
+
+          <div class="email-container">
+            <label>Phone Number</label>
+            <input type="text" placeholder="John Deo" id="js-user-address">
+          </div>
+
+          <div class="email-container">
+            <label>Investment Type</label>
+            <input type="text" placeholder="Bronze Membership" id="js-user-investment-type">
+          </div>
+
           <div class="password-container">
             <label> Balance</label>
             <input type="number" placeholder="100kg" id="js-user-balance">
             <p>Current balance: 70</p>
           </div>
 
-          <div class="btn-contianer">
-            <button type="submit">Update User</button>
-            <button id="update-user-cancel-btn">Cancel</button>
+          <div class="btn-contianer" style="justify-content: space-between; flex-direction: row;">
+            <button style="background-color: red; color: white;" id="delete-btn">
+              <i class="fa-solid fa-trash-can"></i>
+              Delete User
+            </button>
+            <div style="display:flex; justify-content: space-between; flex-direction: row-reverse; column-gap: 10px;">
+              <button type="submit">Update User</button>
+              <button id="update-user-cancel-btn">Cancel</button>
+            </div>
           </div>
         </form>
+      </div>
+    </div> 
+
+    <div class="overlay" id="delete-user-overlay" hidden style="display: none; height: 100vh;">
+      <div class="add-user-container" style="height: 250px; margin: 100px 0;">
+        <div class="add-header" id="hd-fr-delete">
+          <h3>Are you absolutely sure ?</h3>
+        </div>
+
+        <p style="font-family: 'Roboto', sans-serif; font-size: 16px; font-style: normal; font-weight: 400;">This action can not be undone. This will permanently delete user and associated data.</p>
+
+        <div class="btn-contianer" style="justify-content: flex-end; flex-direction: row; margin-top: 20px;">
+          <div style="display:flex; justify-content: space-between; flex-direction: row-reverse; column-gap: 10px;">
+            <button style="background-color: red; color: white;">
+              <i class="fa-solid fa-trash-can"></i>
+              Delete User
+            </button>
+            <button id="update-user-cancel-btn">Cancel</button>
+          </div>
+        </div>
       </div>
     </div> 
   </main>

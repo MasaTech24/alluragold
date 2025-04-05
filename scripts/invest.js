@@ -35,8 +35,6 @@ const interAmountDiv = document.getElementById('js-inter-amount-div');
 const diamondAmtDiv = document.getElementById('js-diamond-amount-div');
 
 const interDiv = document.querySelector('#international-div');
-const interAmountBtn = document.querySelector('.inter-amount-btn');
-const diamondAmountBtn = document.getElementById('diamond-amount-btn');
 const interConfirmDiv = document.querySelector('#js-inter-confrim-div');
 const DiamondConfirmDiv = document.querySelector('#js-diamond-confrim-div');
 

@@ -1,15 +1,56 @@
 import { auth, database } from './firebase.js'; 
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
 import { ref, set, onValue, push, get, runTransaction, update  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";  
 
-const totalUsersRef = ref(database, 'totalUsers');
-onValue(totalUsersRef, (snapshot) => {
-  const total = snapshot.val() || 0;
-  document.getElementById('total-user').textContent = total
+
+// const totalUsersRef = ref(database, 'totalUsers');
+// onValue(totalUsersRef, (snapshot) => {
+//   const total = snapshot.val() || 0;
+//   document.getElementById('total-user').textContent = total
+// });
+// set(totalUsersRef, 0);
+
+const loader = document.getElementById('loader');
+
+// Check authentication state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, check if admin
+    checkAdminStatus(user);
+    return
+  } else {
+    // No user signed in, redirect to sign-in page
+    console.log('No user signed in, redirecting to sign-in page.');
+    window.location.href = 'sign-in-admin.html';
+  }
 });
-set(totalUsersRef, 0);
+
+async function checkAdminStatus(user) {
+  try{
+    const adminRef = ref(database, `admins/${user.uid}`);
+    const adminSnapshot = await get(adminRef);
+    if (!adminSnapshot.exists() || adminSnapshot.val() !== true) {
+      console.log('User is not an admin:', user.uid);
+      window.location.href = 'sign-in-admin.html';
+    }
+    // User is an admin, load the dashboard
+    // console.log('Admin verified:', user.uid);
+    // loader.style.display = 'none';
+    fetchAndDisplayUsers();
+    fetchAndDisplayTransactions();
+
+
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    window.location.href = 'sign-in-admin.html'; // Redirect on error
+  }
+}
+
+
 
 function addUser() {
+  const fullname = document.getElementById('js-fullname').value;
+  const username = document.getElementById('js-username').value.trim();
   const email = document.querySelector('#js-email').value;  
   const password = document.querySelector('#js-password').value;
 
@@ -151,8 +192,8 @@ function fetchAndDisplayUsers(){
             <div class="user-id">
               <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
               <div>
-                <h4>${user.email}</h4>
-                <p>ID: ${user.displayId}</p>
+                <h4>${user.username}</h4>
+                <p>ID: ${user.email}</p>
               </div>
             </div>
           </td>
@@ -189,8 +230,23 @@ async function fetchAndDisplayTransactions() {
   
   transactionBody.innerHTML = ''; 
 
+  const adminUid = "oKmtt5pApHZqDjSyCp3uO1Y2gHJ2"; 
+  set(ref(database, `admins/${adminUid}`), true)
+  .then(() => console.log("Admin UID added"))
+  .catch((error) => console.error("Error adding admin UID:", error));
+
+
+  // console.log('Current user:', adminUid); 
+  if (!adminUid) {
+    transactionBody.innerHTML = '<tr><td colspan="4">Please log in as an admin to view transactions.</td></tr>';
+    console.log("No user logged in. Please log in as an admin.");
+    return; 
+  }
+
+  // console.log('Logged-in user UID:', adminUid);
+
   try{
-    const usersSnapshot = await get(ref(database, 'users/'));  
+    const usersSnapshot = await get(ref(database, 'users/')); 
     if (usersSnapshot.exists()) {  
       const users = usersSnapshot.val(); 
       let globalCounter = 1; 
@@ -216,12 +272,17 @@ async function fetchAndDisplayTransactions() {
                 <p>${transaction.type}</p>  
               </td>  
               <td class="created">  
-                <p>User ID: ${user.displayId}</p>  
+                <p> ${user.email}</p>  
               </td>  
               <td>  
                 <div class="active-div">  
                   <i class="fa-solid fa-calendar-days"></i>  
                   <p>${transaction.date}</p>  
+                </div>  
+              </td>  
+              <td>  
+                <div class="active-div">  
+                  <i class="fa-solid fa-trash-can" style="color: red"></i>
                 </div>  
               </td>  
            `; 
@@ -236,8 +297,7 @@ async function fetchAndDisplayTransactions() {
   } catch (error) {  
     console.error('Error fetching transactions:', error);  
   } 
-
-  // const transactionsRef = ref(database, 'users/' + userId + '/transactions/');   
+  
   // onValue(transactionsRef, (snapshot) => {  
   //   const transactions = snapshot.val();  
   //   console.log('Received transactions:', transactions); 
@@ -281,6 +341,8 @@ async function fetchAndDisplayTransactions() {
   //   console.error('Error fetching transactions:', error);  
   // });  
 } 
+
+
 async function openEditUserForm(userId) {
   try{
     const userSnapshot = await get(ref(database, `users/${userId}`));
@@ -397,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   populateUserSelected();
-  fetchAndDisplayTransactions();
+  fetchAndDisplayTransactions(); 
 
 
   updateUserForm.addEventListener('submit', async(e) => {
@@ -427,4 +489,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
+  // delete pop up 
+  document.getElementById('delete-btn').addEventListener('click', () => {
+    updateUserForm.style.opacity = '1';
+    updateUserForm.style.display = 'flex';
+    document.getElementById('delete-user-overlay').style.display = "flex"
+    document.getElementById('delete-user-overlay').style.opacity = '1'
+  })
+  
 });  

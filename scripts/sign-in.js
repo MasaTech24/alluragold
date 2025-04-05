@@ -33,7 +33,7 @@ async function signIn(event){
     }  
   
   signInBtn.disabled = true;  
-  signInBtn.innerHTML = "Please wait...";  
+  signInBtn.innerHTML = "Signing In...";  
    
   try{
     await signInWithEmailAndPassword(auth, identifier, password);
