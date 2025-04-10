@@ -73,6 +73,7 @@ header a:hover{
 #sign-in{
   color: var(--color);
   font-weight: 500;
+  cursor: pointer;
 }
 .icon{
   display: none;
@@ -160,6 +161,10 @@ button:active{
   font-size: 29px;
   font-family: var(--font-family);
   font-weight: 700;
+}
+.container h1{
+  color: var(--color);
+  font-size: 35px;
 }
 .card-container{
   padding-top: 60px;

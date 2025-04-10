@@ -42,7 +42,7 @@ document.addEventListener(('DOMContentLoaded'), () => {
       const adminSnapshot = await get(adminRef);
       if (!adminSnapshot.exists() || adminSnapshot.val() !== true) {
         // window.location.href = "sign-in-admin.html"; 
-        throw new Error('Access denied: Admin privileges required.');
+        // throw new Error('Access denied: Admin privileges required.');
       }
       console.log('Admin signed in:', user.uid);
       window.location.href = "adminDb.html"; 
@@ -90,8 +90,8 @@ document.addEventListener(('DOMContentLoaded'), () => {
       const adminRef = ref(database, `admins/${user.uid}`);
       const adminSnapshot = await get(adminRef);
       if (!adminSnapshot.exists() || adminSnapshot.val() !== true) {
-        console.log('User is not an admin:', user.uid);
-        alert('Access denied: You are not an admin.');
+        // console.log('User is not an admin:', user.uid);
+        // alert('Access denied: You are not an admin.');
         // window.location.href = 'sign-in-admin.html'; 
         loader.style.display = 'none';
         signInButton.disabled = false;

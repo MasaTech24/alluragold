@@ -2,15 +2,7 @@ import {database } from './firebase.js';
 
 import { ref, get, push, set, onValue} from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"; 
 
-const signOutBtnn = document.querySelector('.js-sign-out');
-signOutBtnn.addEventListener('click', () => {
-  sessionStorage.removeItem("userEmail");
-  sessionStorage.removeItem("userName");
-  sessionStorage.removeItem("userChackings");
-  sessionStorage.removeItem("userSavings");
-  window.location.replace('/index');
-  sessionStorage.removeItem('isLoggedIn');
-})
+
 // Reference 
 const Cance_btn = document.querySelector('#js-cancel-btn');
 
@@ -37,6 +29,17 @@ const diamondAmtDiv = document.getElementById('js-diamond-amount-div');
 const interDiv = document.querySelector('#international-div');
 const interConfirmDiv = document.querySelector('#js-inter-confrim-div');
 const DiamondConfirmDiv = document.querySelector('#js-diamond-confrim-div');
+
+const signOutBtnn = document.querySelector('.js-sign-out');
+signOutBtnn.addEventListener('click', () => {
+  // sessionStorage.removeItem("userEmail");
+  // sessionStorage.removeItem("userName");
+  // sessionStorage.removeItem("userChackings");
+  // sessionStorage.removeItem("userSavings");
+  // sessionStorage.removeItem('isLoggedIn');
+  window.location.replace('/index');
+  sessionStorage.clear();  
+})
 
 
 // for bronze investment pLan  
@@ -182,115 +185,23 @@ function showComfrimDetails() {
   investDiamond.style.display = "none";
 }
 
-// showing the withdrawal details and function 
-// function sendMoney(userid){
-//   const amountInp = Number(document.querySelector('.amount-input').value);
 
 
-//   // Check if the amount does not exceed the limit for the transaction (here, for example, $50)  
-//   if (amountInp <= 0 || amountInp > 50000) {  
-//     alert('Investment must be greater than $0 and cannot exceed $50,000.');  
-//     return;  
-//   } 
 
-//   // Assuming you have a predefined conversion factor from dollars to kg  
-//   const conversionRate = 3000;
-//   const amountInKg = amountInp / conversionRate; 
-//   const formattedAmountInKg = amountInKg + " kg";  
+const confirmBtn = document.querySelector('#confirm-details-btn');  
+confirmBtn.addEventListener('click', handleConfirmClick); 
 
-//   const remark = sessionStorage.getItem('remark') || 'Transaction';
-//   const name = localStorage.getItem('nameInp');
+async function handleConfirmClick() { 
+  confirmBtn.innerHTML = 'Please wait...';  
+  confirmBtn.disabled = true;
 
 
-//   // const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance')
-//   // get(goldBalanceRef).then((snapshot) => {
-//   //   let goldBalance = snapshot.val();
-//   //   if (goldBalance >= amountInp) {
-//   //     let newGoldBalance = goldBalance - amountInp;
-//   //     set(goldBalanceRef, newGoldBalance).then(() => {
-//   //       updateGoldInvestment(userid, amountInKg);
-//   //       saveTransaction(formattedAmountInKg, remark, name); 
-//   //       displaySuccessful();
-//   //     })
-//   //   }else{
-//   //     alert('Insufficient balance in gold account.'); 
-//   //   }
-//   // }).catch((error) => {  
-//   //   console.error("Error fetching checking balance:", error);   
-//   // });
-// }
- 
+  const investmentType = document.querySelector('.js-investment-type-input-bronze').value;  
+  const fullname = document.querySelector('.number-input').value;  
+  const address = document.getElementById('bank-name-input').value;  
+  const phone = document.querySelector('.remark-input').value;  
 
-// Function to update the user's gold balance after investing  
-// function updateGoldInvestment(userid, amount) {  
-//   const goldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
-//   get(goldBalanceRef).then((snapshot) => {  
-//     let currentInterGoldBalance = snapshot.val();  
-     
-//     // Deduct the investment amount from gold balance  
-//     if (currentInterGoldBalance >= amount) { 
-//       let newGoldBalance = currentInterGoldBalance; 
-//       set(goldBalanceRef, newGoldBalance).then(() => {  
-//         console.log('Gold balance updated successfully.');  
-//       }).catch((error) => {  
-//         console.error("Error updating gold balance:", error);  
-//       });
-//     }else {  
-//       alert('Insufficient gold balance to invest the specified amount.');  
-//     } 
-//   }).catch((error) => {  
-//     console.error("Error fetching gold balance:", error);  
-//   });
-// }
 
-function saveInvestment(investmentType, fullname, address, phone){
-
-  // Validate retrieved data  
-  if (!investmentType || !fullname || !address || !phone) {  
-    alert('Please ensure all required details are filled out.');  
-    document.querySelector('#confirm-details-btn').innerHTML = 'Confirm Details';
-    return;  
-  } 
-
-  const userId = localStorage.getItem("userId");
-
-  if (!userId) {  
-    console.error('User ID not found. Ensure user is authenticated.');    
-    alert('User not authenticated. Please log in.');  
-    return;
-  }   
-
-  const investmentRef = ref(database, `users/${userId}/investments`);  
-
-  const investmentData = {
-    investmentType,  
-    fullname,  
-    address,  
-    phone,  
-    date: new Date().toISOString() 
-  };
-
-  pushInvestmentData(investmentRef, investmentData);  
-}
-
-function pushInvestmentData(investmentRef, investmentData) {  
-  return push(investmentRef, investmentData)  
-  .then(() => {  
-    alert('Investment saved successfully!');  
-    console.log('Investment details saved:', investmentData);  
-  })  
-  .catch((error) => {  
-    console.error('Error saving investment:', error);  
-    alert('There was an error saving your investment details. Please try again.');  
-  });  
-}  
-
-document.querySelector('#confirm-details-btn').addEventListener('click', () => {
-  document.querySelector('#confirm-details-btn').innerHTML = 'Please wait...'
-  const investmentType = document.querySelector('.js-investment-type-input-bronze').value.trim();  
-  const fullname = document.querySelector('.number-input').value.trim();  
-  const address = document.getElementById('bank-name-input').value.trim();  
-  const phone = document.querySelector('.remark-input').value.trim();  
   console.log({  
     investmentType,  
     fullname,  
@@ -298,9 +209,62 @@ document.querySelector('#confirm-details-btn').addEventListener('click', () => {
     phone  
   });  
 
-  saveInvestment(investmentType, fullname, address, phone)
-  displaySuccessful();
-});
+  //  Validate retrieved data  
+  if (!investmentType || !fullname || !address || !phone) {  
+    alert('Please ensure all required details are filled out.');  
+    confirmBtn.innerHTML = 'Confirm Details';  
+    confirmBtn.disabled = false;
+    return;  
+  } 
+
+  const userId = localStorage.getItem("userId");
+
+  if (!userId) {  
+    console.error('User ID not found. Ensure user is authenticated.');    
+    alert('User not authenticated. Please log in.');
+    confirmBtn.innerHTML = 'Confirm Details';
+    confirmBtn.disabled = false;   
+    return;
+  }   
+  await saveInvestment(investmentType, fullname, address, phone)
+};
+
+async function saveInvestment(type, fullname, address, phone){
+
+  const userId = localStorage.getItem("userId");
+
+
+  const investmentRef = ref(database, `users/${userId}/investments`); 
+  
+  // Create a shallow copy to avoid circular reference issues  
+  const newInvestmentRef = push(investmentRef);
+  const investmentData = {  
+    fullname: fullname,  
+    type: type, 
+    address: address, 
+    phone: phone,
+    date: new Date().toISOString() 
+  };
+
+  console.log('Investment Reference:', investmentRef, investmentData);  
+
+  try{
+    await set(newInvestmentRef, investmentData)
+      console.log('Investment details stored successfully!');
+      displaySuccessful();
+      confirmBtn.innerHTML = 'Confirm Details'; 
+      confirmBtn.disabled = false;  
+  }catch(error) {  
+    console.error('Error storing investment details:', error);  
+    alert('There was an error saving your investment details. Please try again.');  
+    confirmBtn.innerHTML = 'Confirm Details'; 
+  }finally{
+    confirmBtn.innerHTML = 'Confirm Details';   
+    confirmBtn.disabled = false;  
+  }
+}
+
+
 
 // showing the OTP input details and function 
 function sendOTP() {
@@ -866,8 +830,11 @@ document.addEventListener('DOMContentLoaded', () => {
     onValue(userRef, (snapshot) => {
       const data = snapshot.val();  
       if (data) {
-        // console.log(data.email)
-        document.getElementById('js-user-email').textContent = data.email;   
+
+        document.getElementById('js-user-username').textContent = data.username; 
+        // console.log(data.username)
+        // document.getElementById('js-user-username').textContent = data.email;   
+        // document.getElementById('js-user-username').textContent = data.username;   
       }else {  
         console.log('No user data found.');   
         window.location.href = "sign-in.html";  

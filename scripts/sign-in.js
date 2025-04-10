@@ -4,6 +4,7 @@ import { ref, onValue, query, orderByChild, equalTo, get} from "https://www.gsta
 
 import {  signInWithEmailAndPassword  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
 
+import updateUI from './index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const signInBtn = document.getElementById('sign-btn');
@@ -26,7 +27,7 @@ async function signIn(event){
 
     // Handle email validation only if it looks like an email  
     if (validEmail(identifier)) {  
-      alert('Email format is valid');  
+      console.log('Email format is valid');  
     } else if (identifier.length < 5) {   
       alert('Username should be at least 5 characters long.');  
       return; // Exit if username is too short  
@@ -38,7 +39,10 @@ async function signIn(event){
   try{
     await signInWithEmailAndPassword(auth, identifier, password);
     const user = auth.currentUser;
+    console.log('Auth state after sign-in:', user)
+    sessionStorage.setItem('isLoggedIn', 'true');  
     console.log('User signed in: ', user.uid); 
+    updateUI(user);  
     handleUserData(user);
     
   } catch (emailError) {   
@@ -64,7 +68,11 @@ async function signIn(event){
 
       try {
         await signInWithEmailAndPassword(auth, userEmail, password); 
+        const user = auth.currentUser;
         console.log('User signed in successfully with username.');
+        sessionStorage.setItem('isLoggedIn', 'true');  
+        console.log('User signed in: ', user.uid); 
+        updateUI(user);  
         handleUserData(userData);     
 
       } catch (signinError) {  
@@ -89,30 +97,6 @@ async function signIn(event){
     signInBtn.disabled = false;  
     signInBtn.innerHTML = "SIGN IN";  
   }
-  // signInWithEmailAndPassword(auth, email, password)
-  // .then((userCredential) => {
-  //   const user = userCredential.user;  
-  //   console.log('User signed in: ', user.uid);
-
-  //   const userRef = ref(database, 'users/' + user.uid);  
-
-  //   const signInBtn = document.querySelector('#sign-btn');
-  
-  //   this.disabled = true;
-  //   signInBtn.innerHTML= "Please wait..."
-  //   onValue(userRef, (snapshot) => {
-  //     const data = snapshot.val();
-  //     if(data){
-  //       localStorage.setItem("userName", data.name)
-  //       localStorage.setItem("userId", data.uid);
-  //       sendOTP();
-  //       // return true;
-  //     }else{
-  //       alert('Account Not found');
-  //       return false;
-  //     }
-  //   })
-  // })
 
 }
 
@@ -129,6 +113,8 @@ function handleUserData(user) {
     }else{
       alert('Account Not found');  
     }
+  }, (error) => {
+    console.error('Database error:', error);
   })
 
 }

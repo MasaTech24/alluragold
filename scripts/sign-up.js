@@ -48,12 +48,10 @@ async function signUp() {
     
     if(existingUserSnapshot.exists()){
       alert('Username already in use. please choose a different username');
-      await auth.currentUser.delete();
+      // await auth.currentUser.delete();
       return;
     }
   
-
-
     // Save user details to Realtime Database  
     await set(userRef, userDetails);  
     // await set(ref(database, 'users/' + user.uid), userDetails); 

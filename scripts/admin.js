@@ -1,6 +1,6 @@
 import { auth, database } from './firebase.js'; 
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
-import { ref, set, onValue, push, get, runTransaction, update  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";  
+import { createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";  
+import { ref, set, onValue, push, get, runTransaction, update, remove, equalTo, orderByChild, query  } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";  
 
 
 // const totalUsersRef = ref(database, 'totalUsers');
@@ -13,15 +13,25 @@ import { ref, set, onValue, push, get, runTransaction, update  } from "https://w
 const loader = document.getElementById('loader');
 
 // Check authentication state
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async(user) => {
   if (user) {
     // User is signed in, check if admin
-    checkAdminStatus(user);
-    return
+    const isAdmin = await checkAdminStatus(user);  
+
+    if (isAdmin) {  
+      // Load the dashboard if the user is an admin  
+      fetchAndDisplayUsers();  
+      fetchAndDisplayTransactions();  
+    } 
+    // else {  
+    //   // Redirect if the user is not an admin  
+    //   console.log('User is not an admin:', user.uid);  
+    //   // window.location.href = 'sign-in-admin.html';  
+    // }
   } else {
-    // No user signed in, redirect to sign-in page
-    console.log('No user signed in, redirecting to sign-in page.');
-    window.location.href = 'sign-in-admin.html';
+    // No user signed in, redirect to sign-in page  
+    console.log("No user signed in, redirecting...");  
+    window.location.href = 'sign-in-admin.html';  
   }
 });
 
@@ -29,74 +39,131 @@ async function checkAdminStatus(user) {
   try{
     const adminRef = ref(database, `admins/${user.uid}`);
     const adminSnapshot = await get(adminRef);
-    if (!adminSnapshot.exists() || adminSnapshot.val() !== true) {
-      console.log('User is not an admin:', user.uid);
-      window.location.href = 'sign-in-admin.html';
-    }
-    // User is an admin, load the dashboard
-    // console.log('Admin verified:', user.uid);
-    // loader.style.display = 'none';
-    fetchAndDisplayUsers();
-    fetchAndDisplayTransactions();
-
-
+    return adminSnapshot.exists() && adminSnapshot.val() === true;
   } catch (error) {
     console.error('Error checking admin status:', error);
-    window.location.href = 'sign-in-admin.html'; // Redirect on error
+    return false;
   }
 }
 
 
 
-function addUser() {
+async function addUser() {
+
+  const user = auth.currentUser;  
+  if (!user) {  
+    console.log("User is not authenticated. Stopping operation.");  
+    return; 
+  } 
+
   const fullname = document.getElementById('js-fullname').value;
   const username = document.getElementById('js-username').value.trim();
   const email = document.querySelector('#js-email').value;  
   const password = document.querySelector('#js-password').value;
 
 
-  const countersRef = ref(database, 'counters/userDisplayId');
+  try{
+    // Create user with email and password  
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);  
+    const newUser = userCredential.user;
 
-  runTransaction(countersRef, (currentValue) => {
-    return (currentValue || 0) + 1;
-  }).then((result) => {
-    if (result.committed) {
-      const displayId = result.snapshot.val();
-      createUserWithEmailAndPassword(auth, email, password)    
-      .then((userCredential) => {
-        const user = userCredential.user;
-        const userRef = ref(database, `users/${user.uid}`);
-        return set(userRef, {
-          email: email,
-          displayId: displayId,
-          goldBalance: 0,
-          createdAt: new Date().toISOString(),
-          status: 'Active'
-        }).then(() => {
-          console.log('User added with displayId:', displayId);
-          runTransaction(totalUsersRef, (currentValue) => {
-            return (currentValue || 0) + 1;
-          }).then(() => {
-            console.log('Total users updated');
-          }).catch((error) => {
-            console.error('Error updating total users:', error);
-          });
-          console.log('User added with displayId:', displayId);
-          fetchAndDisplayUsers();
-        });    
-      })
-      .catch((error) => {
-        console.error('Error creating user:', error);
-      })
-      .catch((error) => {
-        console.error('Error adding user:', error);
-      });
-    }else {
-      console.log('Transaction not committed');
+    await updateProfile(newUser, { displayName: username });
+
+    const countersRef = ref(database, 'counters/userDisplayId');  
+    const result = await runTransaction(countersRef, (currentValue) => { 
+      document.querySelector('#total-user').innerHTML = currentValue; 
+      return (currentValue || 0) + 1;  
+    });
+
+    if (!result.committed) {   
+      throw new Error("Transaction not committed"); 
+    }  
+
+    const displayId = result.snapshot.val();  
+    const userRef = ref(database, `users/${newUser.uid}`); 
+
+    const existingUserSnapshot = await get(query(ref(database, 'users'), orderByChild('username'), equalTo(username)));
+
+    if(existingUserSnapshot.exists()){
+      alert('Username already in use. please choose a different username');
+      await auth.currentUser.delete();
+      return;
     }
-  }).catch((error) => {
-    console.error('Error in transaction:', error);
-  });
+
+    await set(userRef, {  
+      email: email,  
+      displayId: displayId,  
+      goldBalance: 0,  
+      createdAt: new Date().toISOString(),  
+      status: 'Active',  
+      fullname: fullname,  
+      username: username  
+    }); 
+
+    console.log("User added successfully:", newUser.uid);    
+    fetchAndDisplayUsers();
+    
+  } catch (error) {  
+    console.error("Error adding user:", error);  
+  } 
+}
+
+function fetchAndDisplayUsers(){
+  const userListElement = document.getElementById('user-list');  
+  
+  const usersRef = ref(database, 'users/');
+  
+  onValue(usersRef, (snapshot) => { 
+    userListElement.innerHTML = ''; 
+    const users = snapshot.val(); 
+    if (users) {  
+      // let userCounter = 1; 
+      Object.keys(users).forEach(key => {  
+        const user = users[key]; 
+        const createdDate = new Date(user.createdAt);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };  
+        const formattedDate = createdDate.toLocaleDateString(undefined, options);
+
+        // Create a new table row  
+        const row = document.createElement('tr');
+        row.dataset.userId = key; // Store user ID
+        row.innerHTML=`
+          <td>
+            <div class="user-id">
+              <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
+              <div>
+                <h4>${user.username}</h4>
+                <p>ID: ${user.email}</p>
+              </div>
+            </div>
+          </td>
+
+            <td class="created">
+            <p>${formattedDate}</p>
+          </td>
+
+          <td>
+            <div class="active-div">
+              <div class="${user.status === 'Active' ? 'active-circle' : 'not-active-circle'}"></div>  
+              <p>${user.status === 'Active' ? 'Online' : 'Offline'}</p>  
+            </div>
+          </td>
+        `;
+
+        row.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const userId = row.dataset.userId;
+          localStorage.setItem('userId', userId)
+          openEditUserForm(userId)
+        });
+        // Append the new row to the user list  
+        userListElement.appendChild(row);
+      })
+    }else {  
+      // Handle case where no users exist  
+      userListElement.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';  
+    }
+  })
 }
 
 function addTransaction (userId, amount, type, date) {
@@ -168,61 +235,7 @@ function populateUserSelected(){
 }
 
 
-function fetchAndDisplayUsers(){
-  const userListElement = document.getElementById('user-list');  
-  
-  const usersRef = ref(database, 'users/');
-  
-  onValue(usersRef, (snapshot) => { 
-    userListElement.innerHTML = ''; 
-    const users = snapshot.val(); 
-    if (users) {  
-      // let userCounter = 1; 
-      Object.keys(users).forEach(key => {  
-        const user = users[key]; 
-        const createdDate = new Date(user.createdAt);
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };  
-        const formattedDate = createdDate.toLocaleDateString(undefined, options);
 
-        // Create a new table row  
-        const row = document.createElement('tr');
-        row.dataset.userId = key; // Store user ID
-        row.innerHTML=`
-          <td>
-            <div class="user-id">
-              <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
-              <div>
-                <h4>${user.username}</h4>
-                <p>ID: ${user.email}</p>
-              </div>
-            </div>
-          </td>
-
-            <td class="created">
-            <p>${formattedDate}</p>
-          </td>
-
-          <td>
-            <div class="active-div">
-              <div class="${user.status === 'Active' ? 'active-circle' : 'not-active-circle'}"></div>  
-              <p>${user.status === 'Active' ? 'Online' : 'Offline'}</p>  
-            </div>
-          </td>
-        `;
-
-        row.addEventListener('click', () => {
-          const userId = row.dataset.userId;
-          openEditUserForm(userId)
-        });
-        // Append the new row to the user list  
-        userListElement.appendChild(row);
-      })
-    }else {  
-      // Handle case where no users exist  
-      userListElement.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';  
-    }
-  })
-}
  
 
 async function fetchAndDisplayTransactions() {  
@@ -282,7 +295,8 @@ async function fetchAndDisplayTransactions() {
               </td>  
               <td>  
                 <div class="active-div">  
-                  <i class="fa-solid fa-trash-can" style="color: red"></i>
+                  <i class="fa-solid fa-trash-can"
+                  style="color: red" id="js-delete-transaction-${userId}-${transactionId}"></i>
                 </div>  
               </td>  
            `; 
@@ -361,6 +375,44 @@ async function openEditUserForm(userId) {
   } catch (error) {
     console.error('Error fetching user data:', error);
   }
+}
+
+// Function to handle delete action  
+async function deleteTransaction(userId, transactionId) {  
+  try {  
+    const transactionRef = ref(database, `users/${userId}/transactions/${transactionId}`);  
+
+    // Remove transaction from database  
+    await remove(transactionRef);  
+    console.log(`Transaction ${transactionId} deleted for user ${userId}`);  
+    
+    // Refresh the transaction display  
+    fetchAndDisplayTransactions();  
+  } catch (error) {  
+    console.error('Error deleting transaction:', error);  
+  }  
+}  
+async function deleteUser(userId){
+  try{
+    const userRef = ref(database, `users/${userId}`); 
+    await remove(userRef); 
+    console.log('User data deleted from database');  
+    
+
+    // Delete the user from Firebase Authentication  
+    const user = auth.currentUser;  
+    if (user && user.uid === userId) {  
+      await user.delete();  
+      console.log('User account deleted from Firebase Authentication');  
+    } else {  
+      console.error('User not authenticated or UID mismatch');  
+    }
+
+    document.getElementById('delete-user-overlay').style.display = "none"
+    document.getElementById('delete-user-overlay').style.opacity = '0'
+  } catch (error) {  
+    console.error('Error deleting user:', error);  
+  } 
 }
 
 
@@ -497,4 +549,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('delete-user-overlay').style.opacity = '1'
   })
   
+
+  // delete user 
+  document.getElementById('js-delete-user').addEventListener('click', () => {
+    const userId = localStorage.getItem('userId');
+    deleteUser(userId)
+  })
+
+  // delete a user transactions 
+  // Adding an event listener for all delete buttons  
+  document.addEventListener('click', function(event) {  
+    if (event.target.closest('[id^="js-delete-transaction-"]')) {  
+      const idParts = event.target.closest('[id^="js-delete-transaction-"]').id.split('-');  
+      const userId = idParts[2];  
+      const transactionId = idParts[3];  
+
+      // Call the deleteTransaction function  
+      deleteTransaction(userId, transactionId);  
+    }  
+  });
 });  

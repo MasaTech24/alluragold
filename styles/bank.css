@@ -111,16 +111,17 @@ a{
 }
 .profile-pop-up{
   background-color: white;
-  padding: 12px 24px;
+  padding: 12px 20px;
   display: flex;
   flex-direction: column;
-  row-gap: 16px;
+  row-gap: 10px;
   position: absolute;
   right: 0;
   top: 50px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   display: none;
+  width: 100px;
 }
 .pop-up{
   display: flex;

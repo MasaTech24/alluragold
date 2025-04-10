@@ -1,17 +1,24 @@
-import { database } from './firebase.js';
+import {auth, database } from './firebase.js';
 
 import { ref, onValue} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";  ;
 
+import updateUI from './index.js';
+
 const userId = localStorage.getItem("userId");
+
+function signOutUser() {  
+  auth.signOut().then(() => {  
+    sessionStorage.setItem('isLoggedIn', 'false');  
+    updateUI(null);  
+    window.location.href = '/';  
+  }).catch((error) => {  
+    console.error('Error signing out:', error.message);  
+  });  
+} 
 
 const signOutBtnn = document.querySelector('.js-sign-out');
 signOutBtnn.addEventListener('click', () => {
-  sessionStorage.removeItem("userEmail");
-  sessionStorage.removeItem("userName");
-  sessionStorage.removeItem("userChackings");
-  sessionStorage.removeItem("userSavings");
-  window.location.replace('/MB-Finance/index');
-  sessionStorage.removeItem('isLoggedIn');
+  signOutUser()
 })
 
 document.addEventListener('DOMContentLoaded', () => { 
@@ -27,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // console.log(data.email)
         document.getElementById('js-user-fullname').textContent = data.fullname; 
         document.getElementById('js-user-username').textContent = data.username; 
-        document.getElementById('js-user-email').textContent = data.email; 
+        // document.getElementById('js-user-email').textContent = data.email; 
         document.getElementById('js-checking').textContent = data.goldBalance + " kg";
         RenderTranasationList(data.uid);  
       }else {  
@@ -66,7 +73,9 @@ function RenderTranasationList(userId) {
         key,
         ...value
       }));
-      transactionArray.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      transactionArray.sort((a, b) => new Date(b.date) - new Date(a.date));  
+
       transactionArray.forEach((transaction) => {
         transactionList.innerHTML += `
           <div class="transactions-lists ">

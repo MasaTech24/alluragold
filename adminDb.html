@@ -213,7 +213,7 @@
     </div> 
 
     <div class="overlay" id="add-transaction-overlay" hidden style="display: none;">
-      <div class="add-transaction-container">
+      <div class="add-transaction-container" style="pointer-events: all;">
         <div class="add-header">
           <h3>Add New Transaction</h3>
           <i class="fa-solid fa-xmark" style="cursor: pointer; pointer-events: all;" id="js-cancle-trans-btn"></i>
@@ -251,14 +251,20 @@
       </div>
     </div>
 
-    <div class="overlay" id="update-user-overlay" hidden style="display: none;">
-      <div class="add-user-container">
+    <div class="overlay" id="update-user-overlay" hidden>
+      <div class="add-user-container" style="pointer-events: all;">
         <div class="add-header">
           <h3>Edit User</h3>
           <i class="fa-solid fa-xmark" style="cursor: pointer;  pointer-events: all;" id="js-cancle-update-btn"></i>
         </div>
 
-        <form id="update-user-form">
+        <form id="update-user-form" style="max-height: 400px; height: 100vh; overflow: auto;">
+          <div class="password-container">
+            <label> Balance</label>
+            <input type="number" placeholder="100kg" id="js-user-balance">
+            <p>Current balance: 70</p>
+          </div>
+
           <div class="email-container">
             <label> Email Address</label>
             <input type="email" placeholder="user@gmail.com" id="js-user-email">
@@ -276,18 +282,12 @@
 
           <div class="email-container">
             <label>Phone Number</label>
-            <input type="text" placeholder="John Deo" id="js-user-address">
+            <input type="text" placeholder="John Deo" id="js-user-phone">
           </div>
 
           <div class="email-container">
             <label>Investment Type</label>
             <input type="text" placeholder="Bronze Membership" id="js-user-investment-type">
-          </div>
-
-          <div class="password-container">
-            <label> Balance</label>
-            <input type="number" placeholder="100kg" id="js-user-balance">
-            <p>Current balance: 70</p>
           </div>
 
           <div class="btn-contianer" style="justify-content: space-between; flex-direction: row;">
@@ -305,7 +305,7 @@
     </div> 
 
     <div class="overlay" id="delete-user-overlay" hidden style="display: none; height: 100vh;">
-      <div class="add-user-container" style="height: 250px; margin: 100px 0;">
+      <div class="add-user-container" style="height: 250px; margin: 100px 0; pointer-events: all;">
         <div class="add-header" id="hd-fr-delete">
           <h3>Are you absolutely sure ?</h3>
         </div>
@@ -314,7 +314,7 @@
 
         <div class="btn-contianer" style="justify-content: flex-end; flex-direction: row; margin-top: 20px;">
           <div style="display:flex; justify-content: space-between; flex-direction: row-reverse; column-gap: 10px;">
-            <button style="background-color: red; color: white;">
+            <button style="background-color: red; color: white;" id="js-delete-user">
               <i class="fa-solid fa-trash-can"></i>
               Delete User
             </button>
