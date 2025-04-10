@@ -292,7 +292,17 @@
     const loader = document.getElementById('loader');
     window.addEventListener('load', ()=> {
       loader.style.display = "none"
-    })
+    });
+
+    function myFunction() {
+        let x = document.getElementById("navLinks");
+        
+        if (x.style.display === "block") {
+          x.style.display = "none";
+        } else {
+          x.style.display = "block";
+      }
+    }
   </script>
 </body>
 </html>
