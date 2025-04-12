@@ -40,6 +40,7 @@ document.addEventListener(('DOMContentLoaded'), () => {
 
       const adminRef = ref(database, `admins/${user.uid}`);
       const adminSnapshot = await get(adminRef);
+      sessionStorage.setItem('isLoggedIn', 'true');  
       if (!adminSnapshot.exists() || adminSnapshot.val() !== true) {
         // window.location.href = "sign-in-admin.html"; 
         // throw new Error('Access denied: Admin privileges required.');
