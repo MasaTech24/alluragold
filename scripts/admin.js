@@ -133,7 +133,7 @@ function fetchAndDisplayUsers(){
               <i class="fa-regular fa-user" style="color: rgba(196,138,0,1);"></i>
               <div>
                 <h4>${user.username}</h4>
-                <p>ID: ${user.email}</p>
+                <p>${user.email}</p>
               </div>
             </div>
           </td>
@@ -294,13 +294,20 @@ async function fetchAndDisplayTransactions() {
                 </div>  
               </td>  
               <td>  
-                <div class="active-div">  
-                  <i class="fa-solid fa-trash-can"
-                  style="color: red" id="js-delete-transaction-${userId}-${transactionId}"></i>
-                </div>  
+                 <div class="active-div">  
+                  <i class="fa-solid fa-trash-can"   
+                     style="color: red;"   
+                     id="js-delete-transaction-${userId}-${transactionId}"></i>  
+                </div>    
               </td>  
            `; 
            transactionBody.appendChild(row);  
+
+           const deleteIcon = row.querySelector(`#js-delete-transaction-${userId}-${transactionId}`); 
+   
+           deleteIcon.addEventListener('click', () => {  
+             deleteTransaction(userId, transactionId);  
+           });  
            globalCounter++ 
           }
         }
@@ -356,7 +363,6 @@ async function fetchAndDisplayTransactions() {
   // });  
 } 
 
-
 async function openEditUserForm(userId) {
   try{
     const userSnapshot = await get(ref(database, `users/${userId}`));
@@ -380,6 +386,7 @@ async function openEditUserForm(userId) {
 // Function to handle delete action  
 async function deleteTransaction(userId, transactionId) {  
   try {  
+    console.log(`Attempting to delete transaction ${transactionId} for user ${userId}`); // Log User and Transaction ID  
     const transactionRef = ref(database, `users/${userId}/transactions/${transactionId}`);  
 
     // Remove transaction from database  
@@ -392,6 +399,7 @@ async function deleteTransaction(userId, transactionId) {
     console.error('Error deleting transaction:', error);  
   }  
 }  
+
 async function deleteUser(userId){
   try{
     const userRef = ref(database, `users/${userId}`); 
@@ -556,16 +564,33 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteUser(userId)
   })
 
+  // cancel for deleting user 
+  document.querySelector('#delete-user-cancel-btn').addEventListener('click', () => {
+    document.getElementById('delete-user-overlay').style.display = "none"
+    document.getElementById('delete-user-overlay').style.opacity = '0'  
+  })
+
   // delete a user transactions 
   // Adding an event listener for all delete buttons  
-  document.addEventListener('click', function(event) {  
-    if (event.target.closest('[id^="js-delete-transaction-"]')) {  
-      const idParts = event.target.closest('[id^="js-delete-transaction-"]').id.split('-');  
-      const userId = idParts[2];  
-      const transactionId = idParts[3];  
+  // document.addEventListener('click', function(event) {  
+  //   if (event.target.closest('[id^="js-delete-transaction-"]')) {  
+  //     const idParts = event.target.closest('[id^="js-delete-transaction-"]').id.split('-');  
+  //     const userId = idParts[2];  
+  //     const transactionId = idParts[3];  
 
-      // Call the deleteTransaction function  
-      deleteTransaction(userId, transactionId);  
-    }  
-  });
+  //     auth.currentUser.getIdTokenResult().then((idTokenResult) => {  
+  //       console.log('Token Result:', idTokenResult);
+  //       if (!!idTokenResult.claims.admin) {  
+  //         deleteTransaction(userId, transactionId);  
+  //         // Call the deleteTransaction function  
+  //       }else{
+  //         console.log('You do not have sufficient privileges to delete this transaction.');  
+  //       }
+  //     }).catch((error) => {  
+  //       console.error('Error checking admin claim:', error);  
+  //     }); 
+  //   }  
+  // });
+
+  // With these lines after appending the row  
 });  

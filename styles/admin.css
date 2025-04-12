@@ -364,4 +364,11 @@ textarea{
     font-size: 13px;
     width: 100%;
   }
+  .add-btn, .transaction-btn, 
+  .btn-contianer button {
+    padding: 10px 10px;
+  }
+  .user-id div{
+    width: 25px;
+  }
 }

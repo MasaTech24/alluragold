@@ -82,13 +82,9 @@ function backButton() {
 
   inputDiv.style.display = "none";
   internationalDiv.style.display = "none"
-  amountDiv.style.display = "none"
   daimondINpDiv.style.display = "none"
-  investBronze.style.display = "block";
   investBronze.style.display = "flex"
-  investPlatinum.style.display = "block";
   investPlatinum.style.display = "flex"
-  investDiamond.style.display = "block";
   investDiamond.style.display = "flex"
 }
 
@@ -97,19 +93,6 @@ function backButton() {
 
 document.querySelector('.details-back-btn')
 .addEventListener('click', confrimBackBtn);
-// function amountBackBtn(){
-//   investMemberH.style.display = "none";
-//   bronzeMemberH.style.display = "block";
-//   platinumMemberH.style.display = "none"
-//   diamondMemberH.style.display = "none"
-
-//   inputDiv.style.display = "flex";
-//   internationalDiv.style.display = "none"
-//   amountDiv.style.display = "none"
-//   investBronze.style.display = "none";
-//   investPlatinum.style.display = "none";
-//   investDiamond.style.display = "none";
-// }
 
 function confrimBackBtn(){
   investMemberH.style.display = "none";
@@ -185,29 +168,26 @@ function showComfrimDetails() {
   investDiamond.style.display = "none";
 }
 
-
-
-
 const confirmBtn = document.querySelector('#confirm-details-btn');  
 confirmBtn.addEventListener('click', handleConfirmClick); 
 
-async function handleConfirmClick() { 
+function handleConfirmClick() { 
   confirmBtn.innerHTML = 'Please wait...';  
   confirmBtn.disabled = true;
 
 
   const investmentType = document.querySelector('.js-investment-type-input-bronze').value;  
-  const fullname = document.querySelector('.number-input').value;  
-  const address = document.getElementById('bank-name-input').value;  
-  const phone = document.querySelector('.remark-input').value;  
+  const fullname = document.querySelector('.number-input').value.trim();  
+  const address = document.getElementById('bank-name-input').value.trim();  
+  const phone = document.querySelector('.remark-input').value.trim();  
 
 
-  console.log({  
-    investmentType,  
-    fullname,  
-    address,  
-    phone  
-  });  
+  // console.log({  
+  //   investmentType,  
+  //   fullname,  
+  //   address,  
+  //   phone  
+  // });  
 
   //  Validate retrieved data  
   if (!investmentType || !fullname || !address || !phone) {  
@@ -226,102 +206,59 @@ async function handleConfirmClick() {
     confirmBtn.disabled = false;   
     return;
   }   
-  await saveInvestment(investmentType, fullname, address, phone)
+  saveInvestment(investmentType, fullname, address, phone)
 };
 
-async function saveInvestment(type, fullname, address, phone){
+function saveInvestment(type, fullname, address, phone){
 
-  const userId = localStorage.getItem("userId");
+  // Proceed with sending the email using EmailJS
+  emailjs.send("service_kwwsd5c","template_dgocp4a", {
+    type: type,
+    fullname: fullname,
+    address: address,
+    phone: phone
+  })
+  .then((response) => {
+    console.log('Invested Sucessfully', response.status);
+    displaySuccessful();
+  }, (error) => {
+    console.error('Error sending :', error);  
+    alert('An error occurred. Please try again later.');  
+  })
+
+  // const userId = localStorage.getItem("userId");
 
 
-  const investmentRef = ref(database, `users/${userId}/investments`); 
+  // const investmentRef = ref(database, `users/${userId}/investments`); 
   
   // Create a shallow copy to avoid circular reference issues  
-  const newInvestmentRef = push(investmentRef);
-  const investmentData = {  
-    fullname: fullname,  
-    type: type, 
-    address: address, 
-    phone: phone,
-    date: new Date().toISOString() 
-  };
+  // const newInvestmentRef = push(investmentRef);
+  // const investmentData = {  
+  //   fullname: fullname,  
+  //   type: type, 
+  //   address: address, 
+  //   phone: phone,
+  //   date: new Date().toISOString() 
+  // };
 
-  console.log('Investment Reference:', investmentRef, investmentData);  
+  // console.log('Investment Reference:', investmentRef, investmentData);  
 
-  try{
-    await set(newInvestmentRef, investmentData)
-      console.log('Investment details stored successfully!');
-      displaySuccessful();
-      confirmBtn.innerHTML = 'Confirm Details'; 
-      confirmBtn.disabled = false;  
-  }catch(error) {  
-    console.error('Error storing investment details:', error);  
-    alert('There was an error saving your investment details. Please try again.');  
-    confirmBtn.innerHTML = 'Confirm Details'; 
-  }finally{
-    confirmBtn.innerHTML = 'Confirm Details';   
-    confirmBtn.disabled = false;  
-  }
+  // try{
+  //   await set(newInvestmentRef, investmentData)
+  //     console.log('Investment details stored successfully!');
+  //     displaySuccessful();
+  //     confirmBtn.innerHTML = 'Confirm Details'; 
+  //     confirmBtn.disabled = false;  
+  // }catch(error) {  
+  //   console.error('Error storing investment details:', error);  
+  //   alert('There was an error saving your investment details. Please try again.');  
+  //   confirmBtn.innerHTML = 'Confirm Details'; 
+  // }finally{
+  //   confirmBtn.innerHTML = 'Confirm Details';   
+  //   confirmBtn.disabled = false;  
+  // }
+
 }
-
-
-
-// showing the OTP input details and function 
-function sendOTP() {
-  let emailInput = sessionStorage.getItem("userEmail");
-  const OTPDiv = document.getElementById('send-otp-div');
-  let otpInp = document.getElementById('otp-input');
-  const otpBtn = document.querySelector('#otp-btn');
-  const serviceID = 'service_kwwsd5c';
-  const templateID = 'template_dgocp4a';
-
-  // Generate an OTP 
-  let otp = Math.floor(Math.random() * 1000000);
-  // console.log(otp)
-
-  let templateParam = {
-    from_name: 'Alluregold Gold Investment',
-    otp: otp,
-    nessage: 'Please Confirm your OTP to process payment',
-    reply_to: emailInput
-  }
-
-  emailjs.send(serviceID, templateID, templateParam).then((res) =>{
-    console.log(res);
-    investMemberH.style.display = "none";
-    bronzeMemberH.style.display = "block";
-    platinumMemberH.style.display = "none";
-    diamondMemberH.style.display = "none";
-
-    inputDiv.style.display = "none"
-    internationalDiv.style.display = "none"
-    amountDiv.style.display = "none";
-    // diamondAmtDiv.style.display = "none";
-    comfrimDiv.style.display = "none";
-    OTPDiv.style.display = "grid";
-    investBronze.style.display = "none";
-    investMemberH.style.display = "none";
-    investDiamond.style.display = "none";
-    console.log('ok')
-
-    otpBtn.addEventListener('click', (e)=>{
-      e.preventDefault()
-      if(otpInp.value == otp){
-        // alert('Email address verified...');
-        // const userId = localStorage.getItem("userId");
-        // sendMoney(userId);
-        alert('YOUR INVESTMENT IS UNDER REVIEW !');
-        return true;
-      }else{
-        alert('Enter correct otp');
-        return false
-      }
-    })
-  },  error => {
-    console.log(error)
-  });
-}
-
 
 // showing the successful message details and function 
 function displaySuccessful(){
@@ -344,7 +281,7 @@ function displaySuccessful(){
 }
 
 document.getElementById('successful-btn').addEventListener('click', () => {
-  console.log("clicked");
+  // console.log("clicked");
   window.location.replace("my_account.html");
 });
 
@@ -368,27 +305,12 @@ function displayPlatinumInvestment(){
   const investmentTypeInputPlatinum = document.querySelector('.js-investment-type-input-platinum');
   investmentTypeInputPlatinum.value = 'Platinum Membership';
 }
+
 // for platinum investment membership back button 
 document.getElementById('international-back-btn')
 .addEventListener('click', backButton);
 
-// showing platinum investment membership amount back button 
-// document.querySelector('.inter-amount-back-btn')
-// .addEventListener('click', interAmountBackBtn);
-function interAmountBackBtn(){
-  investMemberH.style.display = "none";
-  bronzeMemberH.style.display = "none";
-  platinumMemberH.style.display = "block"
-  diamondMemberH.style.display = "none"
 
-  inputDiv.style.display = "none";
-  internationalDiv.style.display = "none"
-  interAmountDiv.style.display = "none"
-  interDiv.style.display = "flex";
-  investBronze.style.display = "none";
-  investPlatinum.style.display = "none";
-  investDiamond.style.display = "none";
-}
 
 // showing platinum investment membership confrim back button 
 document.querySelector('.inter-details-back-btn')
@@ -407,7 +329,7 @@ function interConfrimBackBtn(){
   investDiamond.style.display = "none";
 }
 
-// showing platinum investment membership amount content
+// showing platinum investment membership input content
 interProceedBtn.addEventListener('click', showInterAmountContent);
 function showInterAmountContent() {
 
@@ -438,11 +360,12 @@ function showInterAmountContent() {
   showInterComfrimDetails();
 }
 
+
 function showInterComfrimDetails() {
   const investmentTypeInputPlatinum = document.querySelector('.js-investment-type-input-platinum');
-  const fullname = document.querySelector('.js-Swift-code').value;
-  const address = document.querySelector('.js-bank-name').value;
-  const phone = document.querySelector('.js-remark').value;
+  const fullname = document.querySelector('.js-Swift-code').value.trim();
+  const address = document.querySelector('.js-bank-name').value.trim();
+  const phone = document.querySelector('.js-remark').value.trim();
 
   document.querySelector('.js-investment-type').textContent =   investmentTypeInputPlatinum.value = 'Platinum Membership';
   document.querySelector('.js-SwiftCode').textContent = fullname;
@@ -465,171 +388,212 @@ function showInterComfrimDetails() {
   investDiamond.style.display = "none";
 }
 
-document.querySelector('#platinum-confrim-btn').addEventListener('click', () => {
-  document.querySelector('#platinum-confrim-btn').innerHTML = 'Please wait...';
-  displaySuccessful();
-  // platinumSendOTP()
-});
+const platinumConfirmBtn = document.querySelector('#platinum-confrim-btn')
+platinumConfirmBtn.addEventListener('click',handleplatinumConfirmClick)
 
-function platinumSendOTP() {
-  let emailInput = sessionStorage.getItem("userEmail");
-  const OTPDiv = document.getElementById('send-otp-div');
-  let otpInp = document.getElementById('otp-input');
-  const otpBtn = document.querySelector('#otp-btn');
-  const serviceID = 'service_kwwsd5c';
-  const templateID = 'template_dgocp4a';
-
-  // Generate an OTP 
-  let otp = Math.floor(Math.random() * 1000000);
-
-  let templateParam = {
-    from_name: 'Alluregold Gold Investment',
-    otp: otp,
-    nessage: 'Please Confirm your OTP',
-    reply_to: emailInput
-  }
-
-  emailjs.send(serviceID, templateID, templateParam).then((res) =>{
-    console.log(res);
-    investMemberH.style.display = "none";
-    bronzeMemberH.style.display = "none";
-    platinumMemberH.style.display = "block";
-    diamondMemberH.style.display = "none";
-
-    inputDiv.style.display = "none"
-    internationalDiv.style.display = "none"
-    amountDiv.style.display = "none";
-    interAmountDiv.style.display = "none";
-    // comfrimDiv.style.display = "none";
-    interConfirmDiv.style.display = "none";
-    DiamondConfirmDiv.style.display = "none";
-    OTPDiv.style.display = "grid";
-    investBronze.style.display = "none";
-    investPlatinum.style.display = "none";
-    investDiamond.style.display = "none";
-    console.log('ok')
+function handleplatinumConfirmClick() { 
+  platinumConfirmBtn.innerHTML = 'Please wait...';  
+  platinumConfirmBtn.disabled = true;
 
 
-    otpBtn.addEventListener('click', (e)=>{
-      e.preventDefault()
-      if(otpInp.value == otp){
-        // alert('Email address verified...');
-        // const userId = localStorage.getItem("userId");
-        // interSendMoney(userId)
-        alert('YOUR INVESTMENT IS UNDER REVIEW !');
-        return true;
-      }else{
-        alert('Enter correct otp');
-        return false;
-      }
-    })
-  },  error => {
-    console.log(error)
-  })
-}
+  const investmentTypePlatinum = document.querySelector('.js-investment-type-input-platinum').value;
+  const fullname = document.querySelector('.js-Swift-code').value.trim();
+  const address = document.querySelector('.js-bank-name').value.trim();
+  const phone = document.querySelector('.js-remark').value.trim();
 
 
-function interSendMoney(userid){
-  const amountInp = Number(document.querySelector('.js-amount').value);
+  // console.log({  
+  //   investmentType,  
+  //   fullname,  
+  //   address,  
+  //   phone  
+  // });  
 
-  // Check if the amount does not exceed the $50 limit  
-  if (amountInp > 100) {  
-    alert('Investment cannot exceed $100.');  
+  //  Validate retrieved data  
+  if (!investmentTypePlatinum || !fullname || !address || !phone) {  
+    alert('Please ensure all required details are filled out.');  
+    platinumConfirmBtn.innerHTML = 'Confirm Details';  
+    platinumConfirmBtn.disabled = false;
     return;  
-  }  
+  } 
 
-  // Assuming you have a predefined conversion factor from dollars to kg  
-  const conversionRate = 3000;
-  const amountInKg = amountInp / conversionRate; 
-
-  const formattedAmountInKg = amountInKg + " kg";  
-
-
-  const interName = localStorage.getItem('internameInp');
-  const interRemark = localStorage.getItem('interRemarkInp');
-
-
-
-  // const interGoldBalanceRef = ref(database, `users/${userid}/goldBalance`)
-  // get(interGoldBalanceRef).then((snapshot) => {
-  //   let InterGoldBalance = snapshot.val();
-  //   if (InterGoldBalance >= amountInp) {
-  //     let newGoldBalance = InterGoldBalance - amountInp;
-  //     set(interGoldBalanceRef, newGoldBalance).then(() => {
-  //       updateInterGoldInvestment(userid, amountInKg);
-  //       InterSaveTransaction(formattedAmountInKg, interRemark, interName); 
-  //       interDisplaySuccessful();
-  //     })
-  //   }else{
-  //     alert('Insufficient balance in gold account.'); 
-  //   }
-  // }).catch((error) => {  
-  //   console.error("Error fetching checking balance:", error);   
-  // });
-}
-
-// Function to update the user's gold balance after investing  
-function updateInterGoldInvestment(userid, amount) {  
-  const IntergoldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
-  get(IntergoldBalanceRef).then((snapshot) => {  
-    let currentInterGoldBalance = snapshot.val();  
-     
-    // Deduct the investment amount from gold balance  
-    if (currentInterGoldBalance >= amount) { 
-      let newGoldBalance = currentInterGoldBalance; 
-      set(IntergoldBalanceRef, newGoldBalance).then(() => {  
-        console.log('Gold balance updated successfully.');  
-      }).catch((error) => {  
-        console.error("Error updating gold balance:", error);  
-      });
-    }else {  
-      alert('Insufficient gold balance to invest the specified amount.');  
-    } 
-  }).catch((error) => {  
-    console.error("Error fetching gold balance:", error);  
-  }); 
-}
-
-function InterSaveTransaction( interAmount, interRemark, interName) {
-  // Get the current user's ID
   const userId = localStorage.getItem("userId");
 
-  const transactionDetails = {
-    name: interName,
-    remark: interRemark,
-    amount: interAmount,
-    date: new Date().toISOString()
-  };
-  const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
+  if (!userId) {  
+    console.error('User ID not found. Ensure user is authenticated.');    
+    alert('User not authenticated. Please log in.');
+    platinumConfirmBtn.innerHTML = 'Confirm Details';
+    platinumConfirmBtn.disabled = false;   
+    return;
+  }   
+  saveInvestment(investmentTypePlatinum, fullname, address, phone)
+};
 
 
-  push(userTransactionRef, transactionDetails);
+// function platinumSendOTP() {
+//   let emailInput = sessionStorage.getItem("userEmail");
+//   const OTPDiv = document.getElementById('send-otp-div');
+//   let otpInp = document.getElementById('otp-input');
+//   const otpBtn = document.querySelector('#otp-btn');
+//   const serviceID = 'service_kwwsd5c';
+//   const templateID = 'template_dgocp4a';
 
-}
+//   // Generate an OTP 
+//   let otp = Math.floor(Math.random() * 1000000);
+
+//   let templateParam = {
+//     from_name: 'Alluregold Gold Investment',
+//     otp: otp,
+//     nessage: 'Please Confirm your OTP',
+//     reply_to: emailInput
+//   }
+
+//   emailjs.send(serviceID, templateID, templateParam).then((res) =>{
+//     console.log(res);
+//     investMemberH.style.display = "none";
+//     bronzeMemberH.style.display = "none";
+//     platinumMemberH.style.display = "block";
+//     diamondMemberH.style.display = "none";
+
+//     inputDiv.style.display = "none"
+//     internationalDiv.style.display = "none"
+//     amountDiv.style.display = "none";
+//     interAmountDiv.style.display = "none";
+//     // comfrimDiv.style.display = "none";
+//     interConfirmDiv.style.display = "none";
+//     DiamondConfirmDiv.style.display = "none";
+//     OTPDiv.style.display = "grid";
+//     investBronze.style.display = "none";
+//     investPlatinum.style.display = "none";
+//     investDiamond.style.display = "none";
+//     console.log('ok')
 
 
-function interDisplaySuccessful(){
-  const OTPDiv = document.getElementById('send-otp-div');
-  const successfulDiv = document.querySelector('.successful');
-  const amountInp = document.querySelector('.js-amount').value;
-  const formattedAmountInp = Number(amountInp).toLocaleString('en-US', {style: 'currency', currency: 'USD'})
-  document.querySelector('.you-sent').textContent = formattedAmountInp ;
-  document.querySelector('.deducted').textContent = formattedAmountInp ;
+//     otpBtn.addEventListener('click', (e)=>{
+//       e.preventDefault()
+//       if(otpInp.value == otp){
+//         // alert('Email address verified...');
+//         // const userId = localStorage.getItem("userId");
+//         // interSendMoney(userId)
+//         alert('YOUR INVESTMENT IS UNDER REVIEW !');
+//         return true;
+//       }else{
+//         alert('Enter correct otp');
+//         return false;
+//       }
+//     })
+//   },  error => {
+//     console.log(error)
+//   })
+// }
 
-  send.style.display = "none";
-  local.style.display = "none";
-  international.style.display = "none";
 
-  inputDiv.style.display = "none"
-  internationalDiv.style.display = "none"
-  amountDiv.style.display = "none";
-  interAmountDiv.style.display = "none";
-  comfrimDiv.style.display = "none";
-  OTPDiv.style.display = "none";
-  successfulDiv.style.display = "flex";
-  sendLocal.style.display = "none";
-  sendInternation.style.display = "none";
-}
+
+
+// function interSendMoney(userid){
+//   const amountInp = Number(document.querySelector('.js-amount').value);
+
+//   // Check if the amount does not exceed the $50 limit  
+//   if (amountInp > 100) {  
+//     alert('Investment cannot exceed $100.');  
+//     return;  
+//   }  
+
+//   // Assuming you have a predefined conversion factor from dollars to kg  
+//   const conversionRate = 3000;
+//   const amountInKg = amountInp / conversionRate; 
+
+//   const formattedAmountInKg = amountInKg + " kg";  
+
+
+//   const interName = localStorage.getItem('internameInp');
+//   const interRemark = localStorage.getItem('interRemarkInp');
+
+
+
+//   // const interGoldBalanceRef = ref(database, `users/${userid}/goldBalance`)
+//   // get(interGoldBalanceRef).then((snapshot) => {
+//   //   let InterGoldBalance = snapshot.val();
+//   //   if (InterGoldBalance >= amountInp) {
+//   //     let newGoldBalance = InterGoldBalance - amountInp;
+//   //     set(interGoldBalanceRef, newGoldBalance).then(() => {
+//   //       updateInterGoldInvestment(userid, amountInKg);
+//   //       InterSaveTransaction(formattedAmountInKg, interRemark, interName); 
+//   //       interDisplaySuccessful();
+//   //     })
+//   //   }else{
+//   //     alert('Insufficient balance in gold account.'); 
+//   //   }
+//   // }).catch((error) => {  
+//   //   console.error("Error fetching checking balance:", error);   
+//   // });
+// }
+
+// Function to update the user's gold balance after investing  
+// function updateInterGoldInvestment(userid, amount) {  
+//   const IntergoldBalanceRef = ref(database, 'users/' + userid + '/goldBalance'); 
+//   get(IntergoldBalanceRef).then((snapshot) => {  
+//     let currentInterGoldBalance = snapshot.val();  
+     
+//     // Deduct the investment amount from gold balance  
+//     if (currentInterGoldBalance >= amount) { 
+//       let newGoldBalance = currentInterGoldBalance; 
+//       set(IntergoldBalanceRef, newGoldBalance).then(() => {  
+//         console.log('Gold balance updated successfully.');  
+//       }).catch((error) => {  
+//         console.error("Error updating gold balance:", error);  
+//       });
+//     }else {  
+//       alert('Insufficient gold balance to invest the specified amount.');  
+//     } 
+//   }).catch((error) => {  
+//     console.error("Error fetching gold balance:", error);  
+//   }); 
+// }
+
+// function InterSaveTransaction( interAmount, interRemark, interName) {
+//   // Get the current user's ID
+//   const userId = localStorage.getItem("userId");
+
+//   const transactionDetails = {
+//     name: interName,
+//     remark: interRemark,
+//     amount: interAmount,
+//     date: new Date().toISOString()
+//   };
+//   const userTransactionRef = ref(database, 'users/' + userId + '/transactions');
+
+
+//   push(userTransactionRef, transactionDetails);
+
+// }
+
+
+// function interDisplaySuccessful(){
+//   const OTPDiv = document.getElementById('send-otp-div');
+//   const successfulDiv = document.querySelector('.successful');
+//   const amountInp = document.querySelector('.js-amount').value;
+//   const formattedAmountInp = Number(amountInp).toLocaleString('en-US', {style: 'currency', currency: 'USD'})
+//   document.querySelector('.you-sent').textContent = formattedAmountInp ;
+//   document.querySelector('.deducted').textContent = formattedAmountInp ;
+
+//   send.style.display = "none";
+//   local.style.display = "none";
+//   international.style.display = "none";
+
+//   inputDiv.style.display = "none"
+//   internationalDiv.style.display = "none"
+//   amountDiv.style.display = "none";
+//   interAmountDiv.style.display = "none";
+//   comfrimDiv.style.display = "none";
+//   OTPDiv.style.display = "none";
+//   successfulDiv.style.display = "flex";
+//   sendLocal.style.display = "none";
+//   sendInternation.style.display = "none";
+// }
+
+
+
 
 
 // for diamond investment membership 
@@ -658,26 +622,7 @@ document.getElementById('diamond-back-btn')
 .addEventListener('click', backButton);
 
 
-// showing diamond  amount back button 
-// document.querySelector('.diamond-amount-back-btn')
-// .addEventListener('click', diamondAmountBackBtn);
-function diamondAmountBackBtn(){
-  investMemberH.style.display = "none";
-  bronzeMemberH.style.display = "none";
-  platinumMemberH.style.display = "none"
-  diamondMemberH.style.display = "block"
-
-  inputDiv.style.display = "none";
-  internationalDiv.style.display = "none"
-  diamondAmtDiv.style.display = "none"
-  interDiv.style.display = "none";
-  daimondINpDiv.style.display = "flex"
-  investBronze.style.display = "none";
-  investPlatinum.style.display = "none";
-  investDiamond.style.display = "none";
-}
-
-// showing diamond investment plan amount content
+// showing diamond investment plan input content
 diamondProceedBtn.addEventListener('click', showDiamondAmountContent);
 function showDiamondAmountContent() {
   // const nameInp = document.querySelector('.js-dmd-acc-name').value;
@@ -706,7 +651,6 @@ function showDiamondAmountContent() {
     investPlatinum.style.display = "none";
     investDiamond.style.display = "none";
     showDiamondComfrimDetails();
-    displaySuccessful();
   }
 }
 
@@ -739,6 +683,7 @@ function showDiamondComfrimDetails() {
 // showing diamond investment membership confrim back button 
 document.querySelector('.diamond-details-back-btn')
 .addEventListener('click', diamondConfrimBackBtn);
+
 function diamondConfrimBackBtn(){
   investMemberH.style.display = "none";
   bronzeMemberH.style.display = "none";
@@ -756,67 +701,104 @@ function diamondConfrimBackBtn(){
   investDiamond.style.display = "none";
 }
 
-document.querySelector('#daimond-confrim-btn').addEventListener('click', () => {
-  document.querySelector('#daimond-confrim-btn').innerHTML = 'Please wait...'
-  dainmondSendOTP()
-});
+const diamondConfrimBtn = document.querySelector('#daimond-confrim-btn');
+diamondConfrimBtn.addEventListener('click', handleDiamondConfrimClick);
 
-function dainmondSendOTP() {
-  let emailInput = sessionStorage.getItem("userEmail");
-  const OTPDiv = document.getElementById('send-otp-div');
-  let otpInp = document.getElementById('otp-input');
-  const otpBtn = document.querySelector('#otp-btn');
-  const serviceID = 'service_kwwsd5c';
-  const templateID = 'template_dgocp4a';
+function handleDiamondConfrimClick() { 
+  diamondConfrimBtn.innerHTML = 'Please wait...';  
+  diamondConfrimBtn.disabled = true;
 
-  // Generate an OTP 
-  let otp = Math.floor(Math.random() * 1000000);
-  // console.log(otp)
 
-  let templateParam = {
-    from_name: 'Alluregold Gold Investment',
-    otp: otp,
-    nessage: 'Please Confirm your OTP to process payment',
-    reply_to: emailInput
-  }
+  const investmentTypeInputDiamond = document.querySelector('.js-investment-type-input-diamond').value;
+  const fullname= document.querySelector('.js-dmd-Swift-code').value.trim();
+  const address = document.querySelector('.js-dmd-bank-name').value.trim();
+  const phone = document.querySelector('.js-dmd-remark').value.trim();
 
-  emailjs.send(serviceID, templateID, templateParam).then((res) =>{
-    console.log(res);
-    investMemberH.style.display = "none";
-    bronzeMemberH.style.display = "none";
-    platinumMemberH.style.display = "none"
-    diamondMemberH.style.display = "block"
 
-    inputDiv.style.display = "none"
-    internationalDiv.style.display = "none"
-    amountDiv.style.display = "none";
-    interAmountDiv.style.display = "none";
-    // comfrimDiv.style.display = "none";
-    interConfirmDiv.style.display = "none";
-    DiamondConfirmDiv.style.display = "none";
-    OTPDiv.style.display = "grid";
-    investBronze.style.display = "none";
-    investPlatinum.style.display = "none";
-    investDiamond.style.display = "none";
-    console.log('ok')
+  // console.log({  
+  //   investmentType,  
+  //   fullname,  
+  //   address,  
+  //   phone  
+  // });  
 
-    otpBtn.addEventListener('click', (e)=>{
-      e.preventDefault()
-      if(otpInp.value == otp){
-        // alert('Email address verified...');
-        // const userId = localStorage.getItem("userId");
-        // sendMoney(userId);
-        alert('YOUR INVESTMENT IS UNDER REVIEW !');
-        return true;
-      }else{
-        alert('Enter correct otp');
-        return false
-      }
-    })
-  },  error => {
-    console.log(error)
-  });
-}
+  //  Validate retrieved data  
+  if (!investmentTypeInputDiamond || !fullname || !address || !phone) {  
+    alert('Please ensure all required details are filled out.');  
+    diamondConfrimBtn.innerHTML = 'Confirm Details';  
+    diamondConfrimBtn.disabled = false;
+    return;  
+  } 
+
+  const userId = localStorage.getItem("userId");
+
+  if (!userId) {  
+    console.error('User ID not found. Ensure user is authenticated.');    
+    alert('User not authenticated. Please log in.');
+    diamondConfrimBtn.innerHTML = 'Confirm Details';
+    diamondConfrimBtn.disabled = false;   
+    return;
+  }   
+  saveInvestment(investmentTypeInputDiamond, fullname, address, phone)
+};
+
+
+// function dainmondSendOTP() {
+//   let emailInput = sessionStorage.getItem("userEmail");
+//   const OTPDiv = document.getElementById('send-otp-div');
+//   let otpInp = document.getElementById('otp-input');
+//   const otpBtn = document.querySelector('#otp-btn');
+//   const serviceID = 'service_kwwsd5c';
+//   const templateID = 'template_dgocp4a';
+
+//   // Generate an OTP 
+//   let otp = Math.floor(Math.random() * 1000000);
+//   // console.log(otp)
+
+//   let templateParam = {
+//     from_name: 'Alluregold Gold Investment',
+//     otp: otp,
+//     nessage: 'Please Confirm your OTP to process payment',
+//     reply_to: emailInput
+//   }
+
+//   emailjs.send(serviceID, templateID, templateParam).then((res) =>{
+//     console.log(res);
+//     investMemberH.style.display = "none";
+//     bronzeMemberH.style.display = "none";
+//     platinumMemberH.style.display = "none"
+//     diamondMemberH.style.display = "block"
+
+//     inputDiv.style.display = "none"
+//     internationalDiv.style.display = "none"
+//     amountDiv.style.display = "none";
+//     interAmountDiv.style.display = "none";
+//     // comfrimDiv.style.display = "none";
+//     interConfirmDiv.style.display = "none";
+//     DiamondConfirmDiv.style.display = "none";
+//     OTPDiv.style.display = "grid";
+//     investBronze.style.display = "none";
+//     investPlatinum.style.display = "none";
+//     investDiamond.style.display = "none";
+//     console.log('ok')
+
+//     otpBtn.addEventListener('click', (e)=>{
+//       e.preventDefault()
+//       if(otpInp.value == otp){
+//         // alert('Email address verified...');
+//         // const userId = localStorage.getItem("userId");
+//         // sendMoney(userId);
+//         alert('YOUR INVESTMENT IS UNDER REVIEW !');
+//         return true;
+//       }else{
+//         alert('Enter correct otp');
+//         return false
+//       }
+//     })
+//   },  error => {
+//     console.log(error)
+//   });
+// }
 
 document.addEventListener('DOMContentLoaded', () => { 
   const userId = localStorage.getItem("userId");
