@@ -570,27 +570,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('delete-user-overlay').style.opacity = '0'  
   })
 
-  // delete a user transactions 
-  // Adding an event listener for all delete buttons  
-  // document.addEventListener('click', function(event) {  
-  //   if (event.target.closest('[id^="js-delete-transaction-"]')) {  
-  //     const idParts = event.target.closest('[id^="js-delete-transaction-"]').id.split('-');  
-  //     const userId = idParts[2];  
-  //     const transactionId = idParts[3];  
-
-  //     auth.currentUser.getIdTokenResult().then((idTokenResult) => {  
-  //       console.log('Token Result:', idTokenResult);
-  //       if (!!idTokenResult.claims.admin) {  
-  //         deleteTransaction(userId, transactionId);  
-  //         // Call the deleteTransaction function  
-  //       }else{
-  //         console.log('You do not have sufficient privileges to delete this transaction.');  
-  //       }
-  //     }).catch((error) => {  
-  //       console.error('Error checking admin claim:', error);  
-  //     }); 
-  //   }  
-  // });
-
-  // With these lines after appending the row  
+  const mobileUserView = document.getElementById('mobile-users-view');
+  const mobileTransactionView = document.getElementById('mobile-tranc-view')
+  mobileUserView.classList.add('active')
+  mobileUserView.addEventListener('click', () => {
+    mobileUserView.classList.add('active');
+    mobileTransactionView.classList.remove('active')
+    document.querySelector('.transaction-container').style.display = 'none';
+    document.querySelector('.users-container').style.display = 'flex';
+  })
+  mobileTransactionView.addEventListener('click', () => {
+    mobileTransactionView.classList.add('active')
+    mobileUserView.classList.remove('active')
+    document.querySelector('.users-container').style.display = 'none';
+    document.querySelector('.transaction-container').style.display = 'flex';
+  })
 });  

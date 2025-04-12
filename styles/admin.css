@@ -319,6 +319,29 @@ textarea{
   color: black;
 }
 
+/* Mobile view  */
+.mobile-view-btn-div{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  column-gap: 80px;
+  margin-bottom: 50px;
+}
+.mobile-view-btn-div button{
+  padding: 10px 12px;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  font-size: 14px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-style: normal;
+}
+.active{
+ background-color: var(--color);
+ color: white;
+}
+
 
 /* tablet screen size  */
 @media screen and (max-width: 768px){
@@ -342,6 +365,12 @@ textarea{
   } */
   .overlay {
     height: 100%;
+  }
+  .mobile-view-btn-div{
+    display: flex;
+  }
+  .transaction-container{
+    display: none;
   }
 }
 
@@ -370,5 +399,8 @@ textarea{
   }
   .user-id div{
     width: 25px;
+  }
+  .mobile-view-btn-div{
+    display: flex;
   }
 }
